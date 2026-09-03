@@ -1,0 +1,214 @@
+pragma silverscript ^0.1.0;
+
+// KoVault — holds the treasury. STATELESS: the redeem script never changes, so
+// its P2SH address is FIXED. Change always returns to the same address, and the
+// `deposit` path can sweep any funds sent to that address into the covenant
+// (so funds sent to the vault address are never locked).
+//
+// Releases funds only when spent with an Approved KoProposal of the SAME treasury
+// (covenant id) whose foreign template hash matches the one baked in here.
+// threshold is baked in (extra call args aren't committed by tx structure).
+contract KoVault(
+    byte[32] initLineage,
+    int proposalTemplatePrefixLen,
+    int proposalTemplateSuffixLen,
+    byte[32] proposalTemplateHash,
+    int maxExecutionFee,
+    int maxDepositInputs,
+    int depositMaxFee
+) {
+    // Mirror of KoProposal's state layout — field order/types MUST match.
+    struct KoProposalState {
+        int proposalId;
+        int operation;
+        byte[32] recipientSpkHash;
+        int amount;
+        int maxFee;
+        int expiresAt;
+        int executionDelay;
+        byte[8] approvalBitmap;
+        int approvalCount;
+        int status;
+        int snapThreshold;
+        int ownerCount;
+        byte[32] owner0;
+        byte[32] owner1;
+        byte[32] owner2;
+        byte[32] owner3;
+        byte[32] owner4;
+        byte[8] rejectBitmap;
+        int rejectCount;
+        byte[32] vaultSpkHash;
+    }
+
+    // ---- state: the covenant lineage this vault belongs to ----
+    //
+    // A vault ADDRESS is not a treasury. Consensus lets anyone bind a genesis
+    // covenant to any scriptPubKey, so a stranger can plant a lineage of his own
+    // making at this very address — and a stateless vault has no way to tell his
+    // from ours, because the script that runs is byte-identical. He then waits for
+    // a payment to arrive (it lands UNBOUND, as every payment does), sweeps it into
+    // HIS lineage, and executes it against a proposal only he can mint. Every rule
+    // about value is satisfied; the money simply never belonged to this treasury.
+    //
+    // So the vault carries its lineage in state and refuses every other. The id
+    // cannot be a constructor constant computed at genesis: covenant_id hashes the
+    // scriptPubKeys of its own genesis group, so a vault inside that group would
+    // have to contain a hash of itself. It is written in afterwards instead, by
+    // KoRoot.bootstrapVault, which mints this UTXO as a CONTINUATION of the root's
+    // own already-established id. See docs/GENESIS-PROVENANCE.md.
+    byte[32] lineage = initLineage;
+
+    // Phase 4 (vault side) — release treasury for an approved TRANSFER_KAS.
+    entrypoint function executeProposal(
+        int proposalInputIndex,
+        int recipientOutputIndex,
+        int vaultChangeOutputIndex,
+        byte[] recipientSpk
+    ) {
+        // LINEAGE. OpInputCovenantId returns ZERO_HASH — not an error — for an input
+        // whose UTXO carries no covenant binding (rusty-kaspa opcodes/mod.rs, and it
+        // is unit-tested there). So a bare `a == b` degenerates to ZERO == ZERO the
+        // moment BOTH inputs are unbound — and a plain payment sent to the vault
+        // address is exactly that until it is swept, so without the check below it
+        // could be paired with a self-minted proposal-shaped UTXO and carried off.
+        // Requiring a non-zero id forces the active input to be a real covenant UTXO.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(cid == lineage);        // ...and it must be THIS treasury's lineage
+        require(OpInputCovenantId(proposalInputIndex) == cid);
+        KoProposalState p = readInputStateWithTemplate(
+            proposalInputIndex, proposalTemplatePrefixLen, proposalTemplateSuffixLen, proposalTemplateHash
+        );
+        require(p.status == 1);                 // Approved (proposal gated on its snapshot threshold)
+        require(p.operation == 1);              // TRANSFER_KAS
+        require(p.maxFee <= maxExecutionFee);
+
+        // The recipient output and the vault change output must be DISTINCT. Nothing
+        // stops a proposal committing recipientSpkHash == blake2b(vaultSpk) — a
+        // net-zero self-send. If both indices then point at ONE output, that single
+        // output satisfies the recipient check (value == amount, spk == vaultSpk) AND
+        // doubles as the change output the value floor below is written against, so
+        // the floor collapses and up to amount+maxFee of the vault walks out to a
+        // separate attacker output while owners believed they approved a net-zero
+        // move. Forcing the two indices apart keeps the recipient value and the change
+        // floor on two different outputs, restoring conservation even for a self-send.
+        require(recipientOutputIndex != vaultChangeOutputIndex);
+
+        require(blake2b(recipientSpk) == p.recipientSpkHash);
+        require(tx.outputs[recipientOutputIndex].scriptPubKey == recipientSpk);
+        require(tx.outputs[recipientOutputIndex].value == p.amount);
+
+        // VALUE, bounded over the whole vault-input SET — not per input. Each vault
+        // UTXO spent here runs its own copy of this script, and every copy is
+        // satisfied by the SAME single change output, so a bound written against
+        // `this` input's value alone protects one UTXO while the rest walk out as
+        // fee or as extra value to whoever the tx pays. The change must instead
+        // cover EVERY sompi arriving from the vault address, less the one approved
+        // amount and the proposal's fee cap — so sum the set, the same walk
+        // `deposit` makes over the same bounded window. The window is what makes
+        // the sum complete: the loop form also requires tx.inputs.length to fit
+        // within maxDepositInputs, so a vault UTXO parked past the last scanned
+        // index does not escape the total — the tx fails to validate at all.
+        byte[] vaultSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        int vaultInSum = 0;
+        for (i, 0, tx.inputs.length, maxDepositInputs) {
+            if (tx.inputs[i].scriptPubKey == vaultSpk) {
+                vaultInSum = vaultInSum + tx.inputs[i].value;
+            }
+        }
+        // change returns to the SAME vault address (compare to this input's spk)
+        require(tx.outputs[vaultChangeOutputIndex].value >= vaultInSum - p.amount - p.maxFee);
+        require(tx.outputs[vaultChangeOutputIndex].scriptPubKey == vaultSpk);
+
+        // OUTPUT PINNING. Consensus never constrains WHICH outputs may carry this
+        // covenant id, so unless this script does, an execution could mint extra
+        // id-bearing outputs (e.g. a forged proposal to drain the change with next),
+        // or drop the binding from the change output and drop the vault back to the
+        // unbound state. Pin it: exactly one output carries cid, and it is the vault
+        // continuation.
+        require(OpCovOutputCount(cid) == 1);
+        require(OpCovOutputIdx(cid, 0) == vaultChangeOutputIndex);
+    }
+
+    // Owner-set rotation no longer migrates the treasury: owners + threshold live
+    // in KoRoot's mutable STATE, so a CONFIG proposal (operation 2) rotates them
+    // in place via KoRoot.executeConfig and the vault is never touched — the
+    // treasury address is permanent. (Previously this contract had a migrateToNewTreasury
+    // path for operation 2; it was removed when owners became mutable state.)
+
+    // Deposit / sweep — permissionless. Spends vault-address UTXOs (the real
+    // covenant vault AND any plain payments mistakenly sent to the vault address)
+    // and requires the consolidated vault output (output 0) to keep >= the sum of
+    // ALL vault-address inputs — not a single sompi may leave. The network fee
+    // must therefore come from extra non-vault inputs the SWEEPER adds (and signs)
+    // themselves, which closes the griefing vector where anyone could burn vault
+    // funds as fees by spamming sweeps. Funds can only flow INTO the vault, never
+    // out — so no approval is needed and nothing can be stolen or drained.
+    // (depositMaxFee is retained as a ctor arg for layout compat but unused: the
+    // fee is the sweeper's own money now, so it needs no cap here.)
+    // Output 0 must CONTINUE an existing vault covenant, never mint a fresh one:
+    // consensus lets any output declare a genesis binding whose id the spender
+    // computes himself, so without the checks below a permissionless sweep could
+    // re-parent the whole vault onto an attacker-chosen covenant (and mint a forged
+    // proposal into the same group) while still satisfying "value never leaves".
+    entrypoint function deposit() {
+        // the vault address = this input's own scriptPubKey (all vault UTXOs share it)
+        byte[] vaultSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        require(tx.outputs[0].scriptPubKey == vaultSpk);
+
+        // The consolidated output must stay inside a covenant, and be the ONLY
+        // id-bearing output — no minting a sibling under the same lineage.
+        byte[32] cid0 = OpOutputCovenantId(0);
+        require(cid0 != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        // THE rule that makes an incoming payment safe. A payment arrives unbound,
+        // so nothing about the payment itself says which lineage may claim it —
+        // whoever sweeps first would otherwise decide, and a stranger who planted a
+        // lineage here can always sweep first. Pinning cid0 to the baked lineage
+        // settles it before anyone races: an incoming sompi can be swept into this
+        // treasury or nowhere at all. A genesis binding cannot forge its way in,
+        // because consensus recomputes a genesis id from the spender's own outpoint
+        // and it will not equal a value fixed before he chose it.
+        require(cid0 == lineage);
+        require(OpCovOutputCount(cid0) == 1);
+        require(OpCovOutputIdx(cid0, 0) == 0);
+
+        // This entrypoint also runs for UNBOUND strays (their covenant id is ZERO),
+        // which is the whole point of a sweep, so the lineage cannot simply be read
+        // off `this` input. Two rules together pin it, and BOTH are needed:
+        //
+        //   boundVaultIns >= 1  — a real vault-address UTXO of cid0 takes part, so
+        //     output 0 provably CONTINUES an existing treasury instead of starting a
+        //     covenant of the sweeper's own making.
+        //   alienVaultIns == 0  — and NO vault-address input carries a DIFFERENT
+        //     non-zero id. Existence alone is not identity: without this, anyone
+        //     could mint a dust UTXO at the vault address under a covenant id he
+        //     authored (consensus lets a genesis binding name any scriptPubKey and
+        //     any outpoint he owns), spend it alongside the real treasury, and have
+        //     output 0 continue HIS lineage. The value rule is untouched by that —
+        //     every sompi is preserved — but the treasury is re-parented onto an
+        //     id whose sibling proposals he alone can mint. Owners' proposals then
+        //     no longer match the id, and his forged one does.
+        //
+        // Sweeping strays is still permitted: their id is ZERO, so they are neither
+        // bound nor alien.
+        int vaultInSum = 0;
+        int boundVaultIns = 0;
+        int alienVaultIns = 0;
+        for (i, 0, tx.inputs.length, maxDepositInputs) {
+            if (tx.inputs[i].scriptPubKey == vaultSpk) {
+                vaultInSum = vaultInSum + tx.inputs[i].value;
+                byte[32] icid = OpInputCovenantId(i);
+                if (icid == cid0) {
+                    boundVaultIns = boundVaultIns + 1;
+                }
+                if (icid != cid0 && icid != 0x0000000000000000000000000000000000000000000000000000000000000000) {
+                    alienVaultIns = alienVaultIns + 1;
+                }
+            }
+        }
+        require(boundVaultIns >= 1);
+        require(alienVaultIns == 0);
+        require(tx.outputs[0].value >= vaultInSum);
+    }
+}

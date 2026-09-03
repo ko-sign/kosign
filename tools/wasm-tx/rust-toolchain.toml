@@ -1,0 +1,11 @@
+# Pinned, because the artefact this crate produces is committed and verified
+# byte for byte (scripts/build-wasm.sh). rustc chooses instruction selection,
+# inlining and section ordering; a different compiler is a different binary from
+# identical source, and the natural reading of that difference is tampering.
+#
+# Bumping this is a deliberate act: change the channel, run `npm run build:wasm`,
+# and commit the regenerated frontend/src/wasm/ alongside it. Anything else
+# leaves the manifest describing a build nobody can reproduce.
+[toolchain]
+channel = "1.96.0"
+targets = ["wasm32-unknown-unknown"]

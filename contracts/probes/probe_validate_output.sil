@@ -1,0 +1,15 @@
+pragma silverscript ^0.1.0;
+
+// PROBE 2 — same-template state continuation.
+//
+// Verifies `validateOutputState(outputIndex, { ...nextState })`: the spending tx
+// must recreate this contract at `outputIndex` with exactly the given state.
+// This is the backbone of every Ko-sign state transition (approve, nonce bumps).
+contract ProbeCounter(int initCount, byte[2] initTag) {
+    int count = initCount;
+    byte[2] tag = initTag;
+
+    entrypoint function step() {
+        validateOutputState(0, { count: count + 1, tag: tag });
+    }
+}

@@ -1,0 +1,38 @@
+pragma silverscript ^0.1.0;
+
+// PROBE 3 — covenant lineage + group enumeration (KIP-20 / OpCov*).
+//
+// This is the single most important primitive for Ko-sign: the covenant id is a
+// 32-byte, NETWORK-ENFORCED lineage tag. An attacker cannot mint a UTXO that
+// claims your covenant id, so "this sibling input belongs to my treasury" is a
+// trustworthy check. Verifies the group enumeration opcodes used to find the
+// sibling Vault/Proposal inputs and outputs inside one transaction.
+contract ProbeCovenantId(int maxIns, int maxOuts) {
+    int amount = 0;
+
+    entrypoint function main(int[] outAmounts) {
+        byte[32] covid = OpInputCovenantId(this.activeInputIndex);
+
+        int inCount = OpCovInputCount(covid);
+        int outCount = OpCovOutputCount(covid);
+        require(inCount <= maxIns);
+        require(outCount <= maxOuts);
+        require(outAmounts.length == outCount);
+
+        int inSum = 0;
+        for (i, 0, inCount, maxIns) {
+            int inIdx = OpCovInputIdx(covid, i);
+            { amount: int a } = readInputState(inIdx);
+            inSum = inSum + a;
+        }
+
+        int outSum = 0;
+        for (i, 0, outAmounts.length, maxOuts) {
+            int outIdx = OpCovOutputIdx(covid, i);
+            outSum = outSum + outAmounts[i];
+            validateOutputState(outIdx, { amount: outAmounts[i] });
+        }
+
+        require(inSum >= outSum);
+    }
+}

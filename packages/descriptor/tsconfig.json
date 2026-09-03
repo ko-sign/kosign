@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // genesis.js is shared plain ESM (the indexer vendors a byte-identical copy, and
+    // treasuryTemplates.js beside it) — typecheck it from its JSDoc rather than
+    // losing the checks entirely.
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["src/**/*", "test/**/*"]
+}

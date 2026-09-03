@@ -1,0 +1,29 @@
+# Browser-side Silverscript compiler (route B, "create treasury" with zero backend).
+# Wraps silverscript-lang's compile_contract in wasm so the browser can compile a
+# treasury's KoRoot/KoVault/KoProposal contracts itself. silverscript-lang lives
+# in the gitignored .tooling clone (built by scripts/build-compiler.sh), so this
+# crate only builds once that exists. Standalone (own [workspace]).
+[package]
+name = "kosign-wasm-silc"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[dependencies]
+wasm-bindgen = "0.2"
+serde_json = "1"
+silverscript-lang = { path = "../../.tooling/silverscript/silverscript-lang" }
+getrandom = { version = "0.2", features = ["js"] }
+getrandom3 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }

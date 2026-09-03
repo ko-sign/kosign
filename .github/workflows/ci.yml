@@ -1,0 +1,218 @@
+# CI: install first (the genesis auditor hashes for itself, so both the frontend
+# and indexer suites need @noble/hashes resolvable — see
+# packages/descriptor/src/genesis.js), then the fast unit tests, the workspace
+# package tests, typecheck and the frontend build.
+# NOT run here: frontend/test/*.manual.mjs — those spend real TN10 funds.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+
+      # frontend/src/wasm/*.wasm is a committed binary that builds every transaction
+      # an owner signs. This hashes it and its Rust sources against the recorded
+      # manifest — no toolchain needed — so the routine failure (edit lib.rs, forget
+      # to rebuild, every suite stays green against the OLD blob) cannot pass. The
+      # rebuild that proves the blob came from that source is the wasm job below.
+      - name: Wasm manifest (committed blob still matches its recorded sources)
+        run: node scripts/wasm-manifest.mjs
+
+      # covenant fee/sweep planning, wasm builder behaviour, and the genesis
+      # provenance gate (which reaches into packages/descriptor)
+      - name: Unit tests (wasm builders, fee model, sweep planner, genesis gate)
+        run: node --test frontend/test/*.test.mjs
+
+      # The stats indexer is a standalone service with its own lockfile. Its suite
+      # carries the byte-identity tripwires between indexer/genesisAudit.mjs and
+      # packages/descriptor/src/genesis.js, and between indexer/treasuryTemplates.js
+      # and the frontend's — a vendored security check that drifts from the original
+      # is worse than none, and one auditing a stale set of covenant templates is
+      # pointed at the wrong contracts entirely.
+      # Conditional because the published repo (scripts/make-opensource.sh) ships
+      # without indexer/ — it is a service with its own deployment story. A step
+      # that hard-codes a directory the checkout may not have turns "not part of
+      # this repo" into a red build on the first push.
+      - name: Install indexer deps
+        if: hashFiles('indexer/package.json') != ''
+        run: npm ci --prefix indexer
+      - name: Indexer tests (address codec, genesis provenance audit)
+        if: hashFiles('indexer/package.json') != ''
+        run: node --test indexer/test/*.test.mjs
+
+      - name: Package tests
+        run: pnpm -r --filter './packages/*' test
+
+      - name: Typecheck
+        run: pnpm -r --filter './packages/*' typecheck
+
+      # Built twice and compared. Nobody can verify a deployment against a build
+      # that does not reproduce — and rollup names chunks by content hash, so a
+      # single stray timestamp renames half of them and every future check would
+      # report a tamper that never happened. Also emits the build digest, which is
+      # what a release should publish somewhere the CDN cannot edit.
+      - name: Frontend build is deterministic, and name it by its contents
+        run: bash scripts/build-frontend.sh --check-determinism
+
+  # The covenant contracts are the security model, so their own suites must run
+  # on every change — they evaluate compiled SCRIPT against synthetic
+  # transactions carrying real covenant bindings, which the JS tests above
+  # cannot reach. This job needs the Silverscript compiler, which has no
+  # published binary and so is cloned and built here (cached between runs).
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+      # needed by the template check below: tsx (root devDependency) and
+      # @noble/hashes (packages/descriptor, which derives the template hash).
+      - name: Install workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache the Silverscript toolchain
+        uses: actions/cache@v4
+        with:
+          path: .tooling
+          key: silverscript-${{ runner.os }}-${{ hashFiles('scripts/build-compiler.sh') }}
+
+      - name: Build the Silverscript compiler + debugger
+        run: bash scripts/build-compiler.sh
+
+      # Fails loudly rather than skipping: a green run must mean these actually ran.
+      - name: Toolchain present
+        run: |
+          test -x .tooling/silverscript/target/debug/cli-debugger
+          test -x .tooling/silverscript/target/debug/examples/silc
+          test -x .tooling/silverscript/target/debug/examples/silc_dbg
+
+      - name: Contracts compile
+        run: bash scripts/compile-all.sh
+
+      # frontend/src/treasuryTemplates.js is the ONLY thing standing between a
+      # contract edit and the addresses the browser derives, and nothing else
+      # pins it to a fresh compile: `npm test` never runs gen-templates.ts, so a
+      # change that skipped regeneration would leave every suite green while the
+      # app derived P2SH addresses for a script that no longer exists — funds
+      # sent to an address whose redeem script nobody holds. Recompile and
+      # require the committed file to be byte-identical.
+      # The mirrors matter as much as the original: the genesis auditor DERIVES the
+      # KoRoot/KoVault it demands at genesis from these templates, so a stale copy
+      # in packages/descriptor or indexer/ is a security check aimed at contracts
+      # nobody runs. gen-templates.ts --write writes every mirror the checkout has,
+      # and the list below is read back from git rather than spelled out, so a repo
+      # that carries fewer mirrors checks fewer — and one that gains a mirror gets
+      # it checked without anyone remembering to add it here.
+      - name: Templates match the compiled contracts
+        run: |
+          node_modules/.bin/tsx scripts/gen-templates.ts --write
+          git diff --exit-code -- $(git ls-files '*treasuryTemplates.js')
+
+      - name: Contract test suites
+        run: bash scripts/test-contracts.sh
+
+      # Asserts that every contract still carries its full set of guards — six
+      # families, counted separately (lineage, owner distinctness, threshold and
+      # ownerCount bounds, the proposal's tally invariant, value floors, bounded
+      # input scans) — and, by stripping each family on its own into a throwaway
+      # copy, that the tests pinning it genuinely fail without it. Signature-gated
+      # families have their fixtures rebuilt against the mutant, or the control
+      # would pass for the wrong reason.
+      - name: Covenant guard families security suite
+        run: bash scripts/test-security.sh
+
+      # The same discipline pointed at the code no node checks. The four defects
+      # the second on-chain round found were all in modules that had a green test
+      # suite at the time — a suite can be large and pin nothing. 22 rules across
+      # the spend guard, the transaction decoder, the genesis auditor, the proposal
+      # scanner, the transfer ceiling and the indexer; removing any one must fail a
+      # NAMED test. Needs pnpm because some of those rules are pinned by vitest.
+      - name: Browser-side guard mutation suite
+        run: bash scripts/test-js-guards.sh
+
+  # The manifest check above proves the committed wasm matches what the manifest
+  # says; only a rebuild proves it matches the SOURCE. secp256k1-sys compiles C
+  # with the host clang and some of it survives into the binary, so byte identity
+  # holds per-toolchain — the toolchain that produced the committed artefacts is
+  # recorded in the manifest, and scripts/build-wasm.sh reports a toolchain
+  # mismatch as such rather than as tampering. Treated as informational until the
+  # build runs in a pinned container; the manifest job above is the gating one.
+  wasm:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The canonical artefact comes from tools/wasm-tx/Dockerfile.repro, and this
+      # job is the HOST check — faster, and useful only when the runner's clang
+      # matches the one recorded in the manifest. It stays informational for that
+      # reason; `npm test`'s manifest check is what gates, and anyone can settle the
+      # question properly with `npm run verify:wasm` (Docker).
+      #
+      # rust-toolchain.toml in tools/wasm-tx pins the exact rustc; installing it
+      # here rather than letting the pin trigger a mid-build download.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.96.0"
+          targets: wasm32-unknown-unknown
+
+      - name: Install a wasm-capable clang (secp256k1-sys compiles C)
+        run: sudo apt-get update && sudo apt-get install -y clang lld
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            tools/wasm-tx/target
+          key: wasm-tx-${{ runner.os }}-${{ hashFiles('tools/wasm-tx/Cargo.lock') }}
+
+      - name: Install wasm-bindgen-cli at the version Cargo.lock pins
+        run: |
+          WANT=$(awk '/^name = "wasm-bindgen"$/{getline; gsub(/[",]/,""); sub(/version = /,""); print; exit}' tools/wasm-tx/Cargo.lock)
+          cargo install wasm-bindgen-cli --version "$WANT" --locked
+
+      # Exit 2 is "the runner's clang is not the one that built the committed
+      # blob", which this job cannot avoid and which is not a finding. Only a
+      # mismatch on an identical toolchain (exit 1) says the blob is not what
+      # the source builds, and that is what should go red here.
+      - name: Rebuild the wasm on the host and compare it byte for byte
+        run: |
+          set +e
+          bash scripts/build-wasm.sh
+          code=$?
+          set -e
+          if [ "$code" = 2 ]; then
+            echo "::notice::wasm rebuild differs because the toolchain differs — expected on a runner; npm run verify:wasm (Docker) is the real check"
+            exit 0
+          fi
+          exit "$code"

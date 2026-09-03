@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    // packages/descriptor/src/genesis.js is deliberately plain ESM (it must run
+    // unbuilt in the browser AND be vendored byte-identically into the standalone
+    // indexer image), so every consumer of @kosign/descriptor has to resolve a .js
+    // module. Its types come from JSDoc; `checkJs` is enabled where it lives.
+    // It imports rather than accepts its hasher and its covenant templates on
+    // purpose — an audit that can be weakened by a forgetful call site is a hole.
+    "allowJs": true,
+    "lib": ["ES2022"],
+    "declaration": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true
+  }
+}

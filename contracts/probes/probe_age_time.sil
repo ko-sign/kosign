@@ -1,0 +1,25 @@
+pragma silverscript ^0.1.0;
+
+// PROBE 1 — timelock primitives. VERIFIED ON-CHAIN 2026-09-02 (see
+// tools/kaspa-probe/src/bin/probe_age.rs and docs/RISKS.md #3): `this.age`
+// compiles to OpCheckSequenceVerify, its unit is DAA SCORE BLOCKS (~10/s on
+// TN10, not seconds), the spender must declare at least minAge in the input's
+// sequence (script gate), consensus enforces the declared wait (BIP-68-shaped
+// check_sequence_lock), and the DISABLED-bit escape hatch is closed by the
+// opcode. Mature spend accepted at age 1051 > 600:
+// txid c9a00f28cb23b96f6a3603d38f77d7702e392cce6c315cbd6f0b07680891db18.
+//
+// Verifies that `this.age` (relative timelock, in DAA blocks since the UTXO
+// was created) and `tx.time` (absolute lower-bound time) compile and, on
+// TN10/TN12, actually gate spending. Ko-sign's executionDelay depends on
+// `this.age`, and its close/expiry path depends on `tx.time >= expiresAt`.
+//
+// NOTE: `tx.time >= X` enforces a LOWER bound only ("not before X"). There is no
+// secure way to enforce "before X" purely in script, so proposal *expiry* is
+// enforceable only on the close path (>=), not on execute (<=). See docs/RISKS.md.
+contract ProbeAgeTime(int minAge, int notBefore) {
+    entrypoint function spend() {
+        require(this.age >= minAge);
+        require(tx.time >= notBefore);
+    }
+}

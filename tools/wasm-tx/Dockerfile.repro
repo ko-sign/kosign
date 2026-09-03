@@ -1,0 +1,84 @@
+# A build of the covenant transaction builder that any machine can reproduce.
+#
+# scripts/build-wasm.sh already rebuilds the committed wasm and compares it byte
+# for byte, which catches the routine failure — edit lib.rs, forget to rebuild.
+# What it cannot do is let a SECOND person check the artefact, because
+# secp256k1-sys compiles C with the host clang and some of it survives into the
+# binary. Byte identity therefore held per-toolchain, and "reproducible" quietly
+# meant "on the machine that built it".
+#
+# This closes that. Everything the build reads is pinned:
+#
+#   the base image  by digest, not tag — a tag is a moving pointer
+#   rustc           by the image, which rust-toolchain.toml then agrees with
+#   apt packages    by snapshot.debian.org at a fixed date, so `apt-get install
+#                   clang` resolves to the same version next year as today
+#   wasm-bindgen    by the version Cargo.lock pins, read from the lockfile
+#   dependencies    by the tracked Cargo.lock
+#   source paths    by --remap-path-prefix, or the binary carries build paths and
+#                   is reproducible only by whoever owns that home directory
+#
+# Debian's `clang` package does not ship llvm-ar — that lives in `llvm`, and
+# cc-rs invokes it to archive secp256k1's compiled C. Without it the build dies
+# at exit 127 deep inside a build script, which reads as anything but a missing
+# package, so the image asserts the binary exists rather than discovering it later.
+#
+# Build and extract:
+#   bash scripts/build-wasm-repro.sh          compare against the committed artefacts
+#   bash scripts/build-wasm-repro.sh --write  adopt the container's output
+#
+# The build is pinned to linux/amd64 by scripts/build-wasm-repro.sh rather than in
+# the FROM line, which buildkit warns about. A wasm32 artefact should not depend on
+# the host architecture, but "should not" is a claim, and fixing one arch turns it
+# into something that does not need to be true.
+
+FROM rust@sha256:5e2214abe154fe26e39f64488952e5c991eeed1d6d6da7cc8381ae83927f0cfc
+
+# Debian's rolling archive would give a different clang in a month, and a different
+# clang is a different binary from identical source. snapshot.debian.org serves the
+# archive as it stood on one date, which is what makes `apt-get install` a pinned
+# operation rather than a wish. Bumping this date is a deliberate act: it changes
+# the artefact, so the committed wasm must be regenerated with it.
+ARG DEBIAN_SNAPSHOT=20260501T000000Z
+RUN set -eux; \
+    printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/%s bookworm main\n' "$DEBIAN_SNAPSHOT" > /etc/apt/sources.list; \
+    printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian-security/%s bookworm-security main\n' "$DEBIAN_SNAPSHOT" >> /etc/apt/sources.list; \
+    rm -f /etc/apt/sources.list.d/debian.sources; \
+    apt-get -o Acquire::Check-Valid-Until=false update; \
+    apt-get install -y --no-install-recommends clang lld llvm; \
+    test -x /usr/bin/llvm-ar; \
+    rm -rf /var/lib/apt/lists/*
+
+RUN rustup target add wasm32-unknown-unknown
+
+WORKDIR /src
+# The lockfile alone, so the wasm-bindgen-cli layer is not rebuilt every time the
+# Rust changes. The CLI and the crate must be the same version or the generated
+# glue silently disagrees with the module it loads, so the version is read from
+# the lockfile rather than written twice.
+COPY Cargo.lock /src/Cargo.lock
+RUN set -eux; \
+    WANT="$(awk '/^name = "wasm-bindgen"$/{getline; gsub(/[",]/,""); sub(/version = /,""); print; exit}' /src/Cargo.lock)"; \
+    test -n "$WANT"; \
+    cargo install wasm-bindgen-cli --version "$WANT" --locked
+
+COPY . /src
+
+# RUSTFLAGS as an environment variable REPLACES .cargo/config.toml's rustflags
+# rather than adding to them, so the getrandom backend cfg has to be repeated
+# here — dropping it does not warn, it fails to link. /cargo and /src are the same
+# canonical prefixes scripts/build-wasm.sh remaps to, so a host build and a
+# container build agree on what the paths inside the binary say.
+ENV CARGO_HOME=/cargo
+RUN set -eux; \
+    RUSTFLAGS='--cfg getrandom_backend="wasm_js" --remap-path-prefix=/cargo=/cargo --remap-path-prefix=/src=/src' \
+    CC_wasm32_unknown_unknown=/usr/bin/clang \
+    AR_wasm32_unknown_unknown=/usr/bin/llvm-ar \
+    cargo build --release --target wasm32-unknown-unknown; \
+    mkdir -p /out; \
+    wasm-bindgen --target web --out-dir /out \
+      target/wasm32-unknown-unknown/release/kosign_wasm_tx.wasm; \
+    rustc --version > /out/TOOLCHAIN; \
+    wasm-bindgen --version >> /out/TOOLCHAIN; \
+    clang --version | head -1 >> /out/TOOLCHAIN; \
+    echo "debian-snapshot ${DEBIAN_SNAPSHOT}" >> /out/TOOLCHAIN

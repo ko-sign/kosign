@@ -1,0 +1,487 @@
+pragma silverscript ^0.1.0;
+
+// KoRoot — treasury-level config registry + proposal factory. Holds the MUTABLE
+// owner set + threshold in STATE (so the script is owner-agnostic and the root
+// address is stable across owner changes), a monotonic proposalNonce, and a tiny
+// reserve. Spending KoRoot creates a new KoProposal UTXO (a foreign template
+// in the same covenant domain) and continues KoRoot with nonce+1, preserving
+// the owner config.
+//
+// The proposal template prefix/suffix/hash are baked in so this contract can mint
+// correctly-shaped KoProposal outputs. They are owner-agnostic now, so they (and
+// the addresses that pin them) do not change when owners change. See
+// docs/OWNER-MANAGEMENT.md.
+contract KoRoot(
+    byte[32] treasuryId,
+    byte[] proposalTemplatePrefix,
+    byte[] proposalTemplateSuffix,
+    byte[32] proposalTemplateHash,
+    int proposalTemplatePrefixLen,
+    int proposalTemplateSuffixLen,
+    byte[32] vaultTemplateHash,
+    int maxProposalFee,
+    int initProposalNonce,
+    int initThreshold,
+    int initOwnerCount,
+    byte[32] initOwner0,
+    byte[32] initOwner1,
+    byte[32] initOwner2,
+    byte[32] initOwner3,
+    byte[32] initOwner4
+) {
+    // Must match KoVault.sil state layout exactly — one field, the covenant id the
+    // vault will refuse to work outside of. Declared here so bootstrapVault can name
+    // the layout it mints into.
+    struct KoVaultState {
+        byte[32] lineage;
+    }
+
+    // Must match KoProposal.sil state layout exactly.
+    struct KoProposalState {
+        int proposalId;
+        int operation;
+        byte[32] recipientSpkHash;
+        int amount;
+        int maxFee;
+        int expiresAt;
+        int executionDelay;
+        byte[8] approvalBitmap;
+        int approvalCount;
+        int status;
+        int snapThreshold;
+        int ownerCount;
+        byte[32] owner0;
+        byte[32] owner1;
+        byte[32] owner2;
+        byte[32] owner3;
+        byte[32] owner4;
+        byte[8] rejectBitmap;
+        int rejectCount;
+        byte[32] vaultSpkHash;
+    }
+
+    // Loop bound for the input walks below. A COMPILE-TIME constant, not a
+    // constructor argument: adding a ctor parameter would change KoRoot's
+    // constructor signature — and with it packages/descriptor's ctor encoding and
+    // every root address derived from it — for a number that is the same for every
+    // treasury. 16 mirrors KoVault's maxDepositInputs — which scripts/gen-templates.ts
+    // fixes at 16 for every treasury this repo mints — so both contracts cap a
+    // covenant spend at the same transaction width.
+    // The client side of that ceiling lives in frontend/src/sweepPlan.js
+    // (MAX_TX_INPUTS), which is what keeps a fragmented wallet from funding a
+    // spend the script would then refuse.
+    int constant maxTxInputs = 16;
+
+    // ---- mutable state: the treasury's config registry ----
+    int proposalNonce = initProposalNonce;
+    int threshold = initThreshold;
+    int ownerCount = initOwnerCount;
+    byte[32] owner0 = initOwner0;
+    byte[32] owner1 = initOwner1;
+    byte[32] owner2 = initOwner2;
+    byte[32] owner3 = initOwner3;
+    byte[32] owner4 = initOwner4;
+
+    function ownerAt(int idx) : pubkey {
+        byte[32] p = owner0;
+        if (idx == 1) { p = owner1; }
+        if (idx == 2) { p = owner2; }
+        if (idx == 3) { p = owner3; }
+        if (idx == 4) { p = owner4; }
+        return pubkey(p);
+    }
+
+    function maskFor(int idx) : byte[8] {
+        byte[8] m = 0x0100000000000000;
+        if (idx == 1) { m = 0x0200000000000000; }
+        if (idx == 2) { m = 0x0400000000000000; }
+        if (idx == 3) { m = 0x0800000000000000; }
+        if (idx == 4) { m = 0x1000000000000000; }
+        return m;
+    }
+
+    // Phase 2 — a single owner opens a proposal (and implicitly casts the first
+    // approval). operation: 1=TRANSFER_KAS, 2=MIGRATE_TREASURY. The current owner set
+    // + threshold are SNAPSHOTTED into the new proposal so approvals evaluate
+    // against the owners as of creation.
+    entrypoint function createProposal(
+        int proposerIndex,
+        sig proposerSig,
+        int operation,
+        byte[32] recipientSpkHash,
+        int amount,
+        int maxFee,
+        int expiresAt,
+        int executionDelay,
+        byte[] vaultTemplatePrefix,
+        byte[] vaultTemplateSuffix
+    ) {
+        // Lineage + output pinning. This root must be a real covenant UTXO, and the
+        // spend may create EXACTLY the two id-bearing outputs below — the root
+        // continuation and the minted proposal. Consensus does not restrict which
+        // outputs inherit a covenant id, so without this a proposal-creating spend
+        // could mint additional forged siblings under the treasury's own lineage.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(OpCovOutputCount(cid) == 2);
+        require(OpCovOutputIdx(cid, 0) == 0);
+        require(OpCovOutputIdx(cid, 1) == 1);
+
+        // VALUE FLOOR. The pinning above fixes WHICH outputs inherit the treasury's
+        // id, not what they are worth, and constrains nothing outside the lineage:
+        // a spend may still carry ordinary outputs of the proposer's choosing. So
+        // the two id-bearing outputs must together retain the input value less the
+        // fee cap (mirrors executeConfig). Without this floor a single owner with a
+        // single valid signature could continue the root and mint the proposal at
+        // dust and pay the rest of the reserve to himself. That steals nothing — the
+        // vault is untouched and the proposal is still honestly shaped — but KIP-9
+        // storage mass grows as output values shrink, so a dust root and a dust
+        // proposal make every later covenant op expensive to relay: one of N owners
+        // could otherwise price the treasury out of being used.
+        //
+        // Bounded over the whole root-input SET — not over `this` input alone. Each
+        // root UTXO spent here runs its own copy of this script and every copy is
+        // satisfied by the SAME two outputs, so a bound written against `this`
+        // input's value alone protects one UTXO while the rest walk out to an
+        // ordinary output. Sum the set instead, the same walk KoVault makes over
+        // the same bounded window. On an honest treasury the sum IS this input's
+        // value — a second root UTXO would have to carry the treasury's covenant
+        // id, and the only output that ever inherits it as a root is output 0 —
+        // and any sibling that could be co-spent here must hold IDENTICAL state
+        // anyway (every copy requires output 0 to carry its own nonce+1 and owner
+        // set), which is exactly the scriptPubKey this walk matches on. The window
+        // is a hard requirement, not a truncation: the loop form also emits
+        // `require(tx.inputs.length <= maxTxInputs)`, so a root
+        // input parked past the last scanned index does not escape the total — the
+        // transaction fails to validate at all.
+        byte[] rootSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        int reserveIn = 0;
+        for (i, 0, tx.inputs.length, maxTxInputs) {
+            if (tx.inputs[i].scriptPubKey == rootSpk) {
+                reserveIn = reserveIn + tx.inputs[i].value;
+            }
+        }
+        require(tx.outputs[0].value + tx.outputs[1].value >= reserveIn - maxProposalFee);
+
+        // GENESIS BOUNDS. threshold and ownerCount are mutable STATE, initialised
+        // from the constructor arguments at mint time and rewritten by executeConfig
+        // — which is exactly why executeConfig can bound them (1..5 / 1..ownerCount)
+        // on every LATER change while the genesis values reached state unchecked:
+        // the constructor enforced nothing, and packages/descriptor only checked
+        // that five owner slots were supplied. A treasury minted outside the UI could
+        // therefore present itself as a 5-owner policy while carrying threshold 0,
+        // and `threshold <= 1` below mints proposals already Approved — one key
+        // moving funds a co-signer believed were under M-of-N. Checked here, on the
+        // only path that can create a proposal, so a malformed genesis is unusable
+        // rather than dangerous: the vault's rules stay value-preserving, so a
+        // bricked treasury leaks nothing. ownerCount is also bounded above because
+        // ownerAt()/maskFor() fall through to owner 0 past the last slot, which
+        // would silently give index >= 5 owner 0's identity and bitmap bit.
+        require(ownerCount >= 1);
+        require(ownerCount <= 5);
+        require(threshold >= 1);
+        require(threshold <= ownerCount);
+
+        // GENESIS OWNER DISTINCTNESS. Identity in this design is the SLOT, not the
+        // key: ownerAt() returns the key in slot i and maskFor() returns bit i, so
+        // one key sitting in several live slots is several owners to every later
+        // check — the duplicate-approval guard compares bitmap bits, never keys, so
+        // its holder can approve once per slot he occupies. owners = [A, A, A, B, C]
+        // at threshold 3 is a 1-of-3 treasury presenting itself as 3-of-5, and A
+        // alone reaches the threshold on a proposal his co-signers believe needs
+        // three of them. docs/OWNER-MANAGEMENT.md already states distinctness as a
+        // validity rule; this is where it is enforced. Only slots BELOW ownerCount
+        // are compared: the unused tail is padded with one shared NUMS key, so
+        // comparing all five would reject every treasury of fewer than five owners.
+        if (ownerCount >= 2) {
+            require(owner0 != owner1);
+        }
+        if (ownerCount >= 3) {
+            require(owner0 != owner2);
+            require(owner1 != owner2);
+        }
+        if (ownerCount >= 4) {
+            require(owner0 != owner3);
+            require(owner1 != owner3);
+            require(owner2 != owner3);
+        }
+        if (ownerCount >= 5) {
+            require(owner0 != owner4);
+            require(owner1 != owner4);
+            require(owner2 != owner4);
+            require(owner3 != owner4);
+        }
+
+        require(proposerIndex >= 0);
+        require(proposerIndex < ownerCount);
+        require(checkSig(proposerSig, ownerAt(proposerIndex)));
+        require(amount > 0);
+        require(maxFee <= maxProposalFee);
+        require(operation >= 1);
+        require(operation <= 2);
+
+        // The vault script-hash the minted proposal commits to (closeExpired pays
+        // the bond back to it). Recomputed HERE, from the hash-pinned vault
+        // template and the live covenant id — the same reveal-and-pin
+        // bootstrapVault uses — because the bond can be root-reserve-funded, so a
+        // proposer-chosen return address would drain the reserve 0.5 KAS a time.
+        require(blake2b(vaultTemplatePrefix + vaultTemplateSuffix) == vaultTemplateHash);
+        byte[1] vaultStateTag = 0x20;
+        byte[32] vaultSpkHash = blake2b(vaultTemplatePrefix + vaultStateTag + cid + vaultTemplateSuffix);
+
+        int newProposalId = proposalNonce + 1;
+        byte[8] initBitmap = maskFor(proposerIndex);
+        int initStatus = 0;
+        if (threshold <= 1) {
+            // threshold is bounded >= 1 above, so this is exactly threshold == 1:
+            // a 1-of-N treasury, not necessarily a 1-of-1. The proposer's own
+            // implicit approval (approvalCount 1) already meets it, so the minted
+            // proposal starts Approved — which KoProposal.execute re-derives with
+            // `approvalCount >= snapThreshold`.
+            initStatus = 1;
+        }
+
+        // continue KoRoot with bumped nonce, preserving the owner config
+        validateOutputState(0, {
+            proposalNonce: newProposalId,
+            threshold: threshold,
+            ownerCount: ownerCount,
+            owner0: owner0,
+            owner1: owner1,
+            owner2: owner2,
+            owner3: owner3,
+            owner4: owner4
+        });
+
+        // mint the KoProposal UTXO (foreign template, same covenant domain) with
+        // the current owner set snapshotted in
+        validateOutputStateWithTemplate(
+            1,
+            {
+                proposalId: newProposalId,
+                operation: operation,
+                recipientSpkHash: recipientSpkHash,
+                amount: amount,
+                maxFee: maxFee,
+                expiresAt: expiresAt,
+                executionDelay: executionDelay,
+                approvalBitmap: initBitmap,
+                approvalCount: 1,
+                status: initStatus,
+                snapThreshold: threshold,
+                ownerCount: ownerCount,
+                owner0: owner0,
+                owner1: owner1,
+                owner2: owner2,
+                owner3: owner3,
+                owner4: owner4,
+                rejectBitmap: 0x0000000000000000,
+                rejectCount: 0,
+                vaultSpkHash: vaultSpkHash
+            },
+            proposalTemplatePrefix,
+            proposalTemplateSuffix,
+            proposalTemplateHash
+        );
+    }
+
+    // Phase 0 — mint the treasury's vault, stamped with this root's lineage.
+    //
+    // The vault cannot be born in the genesis transaction. A covenant id hashes the
+    // scriptPubKeys of its own genesis group, so a vault that carries the id would
+    // have to contain a hash of itself. Genesis therefore binds the ROOT alone, and
+    // the id it yields depends on nothing but the root — which makes it a value the
+    // vault CAN be built around. This entrypoint does that: it spends the root and
+    // mints, as a CONTINUATION of the root's own id, a KoVault whose state is that
+    // very id. From then on the vault refuses every other lineage, so the address it
+    // lands on is one that only this treasury can ever spend from — which is what
+    // makes an incoming payment to that address safe (see KoVault.deposit).
+    //
+    // The vault template is supplied by the spender rather than baked in, and pinned
+    // by hash: the alternative puts four kilobytes of vault script inside the root's
+    // redeem, revealed again on every proposal any owner ever creates. The hash check
+    // inside validateOutputStateWithTemplate makes the two equivalent in strength.
+    //
+    // Repeatable on purpose. Every call mints another UTXO at the SAME address under
+    // the SAME lineage — that is one more vault UTXO for this treasury and nothing
+    // else, and `deposit` consolidates them. It costs the caller a fee, needs an
+    // owner signature, and the value floor below stops it draining the reserve.
+    entrypoint function bootstrapVault(
+        int ownerIndex,
+        sig ownerSig,
+        byte[] vaultTemplatePrefix,
+        byte[] vaultTemplateSuffix
+    ) {
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(OpCovOutputCount(cid) == 2);
+        require(OpCovOutputIdx(cid, 0) == 0);
+        require(OpCovOutputIdx(cid, 1) == 1);
+
+        require(ownerIndex >= 0);
+        require(ownerIndex < ownerCount);
+        require(checkSig(ownerSig, ownerAt(ownerIndex)));
+
+        // the root continues UNCHANGED — no nonce bump, no config change
+        validateOutputState(0, {
+            proposalNonce: proposalNonce,
+            threshold: threshold,
+            ownerCount: ownerCount,
+            owner0: owner0,
+            owner1: owner1,
+            owner2: owner2,
+            owner3: owner3,
+            owner4: owner4
+        });
+
+        // the vault, carrying this root's lineage as its state
+        validateOutputStateWithTemplate(
+            1,
+            { lineage: cid },
+            vaultTemplatePrefix,
+            vaultTemplateSuffix,
+            vaultTemplateHash
+        );
+
+        // VALUE FLOOR over the root-input SET — same rule and same reasoning as
+        // createProposal: the pinning above says which outputs inherit the id, not
+        // what they are worth, so without this an owner could continue the root at
+        // dust and pay the reserve to himself. Money the caller adds for the vault
+        // comes from his OWN inputs, which this sum does not touch.
+        byte[] rootSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        int reserveIn = 0;
+        for (i, 0, tx.inputs.length, maxTxInputs) {
+            if (tx.inputs[i].scriptPubKey == rootSpk) {
+                reserveIn = reserveIn + tx.inputs[i].value;
+            }
+        }
+        require(tx.outputs[0].value + tx.outputs[1].value >= reserveIn - maxProposalFee);
+    }
+
+    // Phase 4 (config side) — apply an Approved CONFIG proposal: rotate the owner
+    // set / threshold in KoRoot's STATE. KoRoot is consumed together with the
+    // approved proposal (same covenant id); the Vault is NOT touched, so the
+    // treasury address stays put — only the config registry changes. The new owner
+    // config is committed by the proposal as recipientSpkHash =
+    //   blake2b(newThreshold8 ‖ newOwnerCount8 ‖ newOwner0 ‖ … ‖ newOwner4)
+    // and revealed here; we recompute and require it matches before writing it in.
+    // operation 2 = CONFIG (the proposal carries the snapshot owners that approved
+    // it; this entrypoint installs the NEXT owner set for future proposals).
+    entrypoint function executeConfig(
+        int proposalInputIndex,
+        byte[8] newThresholdBytes,
+        byte[8] newOwnerCountBytes,
+        byte[32] newOwner0,
+        byte[32] newOwner1,
+        byte[32] newOwner2,
+        byte[32] newOwner3,
+        byte[32] newOwner4
+    ) {
+        // LINEAGE. An unbound input yields ZERO_HASH rather than an error, so a bare
+        // `a == b` passes when both sides are unbound — so a plain payment to the root
+        // address paired with a self-minted proposal would otherwise install an
+        // attacker-chosen owner set. Demand a real covenant id, then pin the outputs:
+        // only the root continuation may carry it, and the proposal is consumed.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(OpInputCovenantId(proposalInputIndex) == cid);
+        require(OpCovOutputCount(cid) == 1);
+        require(OpCovOutputIdx(cid, 0) == 0);
+        KoProposalState p = readInputStateWithTemplate(
+            proposalInputIndex, proposalTemplatePrefixLen, proposalTemplateSuffixLen, proposalTemplateHash
+        );
+        require(p.status == 1);                 // Approved (gated on its snapshot threshold)
+        require(p.operation == 2);              // CONFIG
+
+        // REPLAY / GENERATION GATE. A CONFIG proposal snapshots the owner set in force
+        // when it was created (createProposal writes snapThreshold/ownerCount/owner0..4
+        // = the CURRENT config). Admit only a proposal whose snapshot still equals the
+        // config installed NOW. Without this, a config approved under an earlier owner
+        // set survives a later rotation and can be replayed to overwrite the current
+        // set — reinstating a removed owner — with a single former-era key and no
+        // current-owner consent (executeConfig checks no signature; KoProposal.execute
+        // authenticates only the proposal's own snapshot). Tying it to the live config
+        // makes every executed rotation invalidate every prior approved-but-unexecuted
+        // config. The nonce is preserved (below), so it is not a version; this is.
+        require(p.snapThreshold == threshold);
+        require(p.ownerCount == ownerCount);
+        require(p.owner0 == owner0);
+        require(p.owner1 == owner1);
+        require(p.owner2 == owner2);
+        require(p.owner3 == owner3);
+        require(p.owner4 == owner4);
+
+        // The committed config must match the revealed config exactly.
+        byte[32] configHash = blake2b(
+            newThresholdBytes + newOwnerCountBytes + newOwner0 + newOwner1 + newOwner2 + newOwner3 + newOwner4
+        );
+        require(configHash == p.recipientSpkHash);
+
+        int newThreshold = OpBin2Num(newThresholdBytes);
+        int newOwnerCount = OpBin2Num(newOwnerCountBytes);
+        require(newOwnerCount >= 1);
+        require(newOwnerCount <= 5);
+        require(newThreshold >= 1);
+        require(newThreshold <= newOwnerCount);
+
+        // OWNER DISTINCTNESS on the installed set — the same rule createProposal
+        // applies to the genesis owners, applied to the config this proposal writes.
+        // Bounding newOwnerCount and newThreshold is not enough: an approved CONFIG
+        // proposal may otherwise install [A, A, A, B, C] at newThreshold 3, and the
+        // registry reaches by the honest path exactly the state the genesis check
+        // rejects — one key holding three slots, three bitmap bits, and the whole
+        // threshold. Slots at or above newOwnerCount are NUMS padding, share one
+        // key by construction, and are therefore not compared.
+        if (newOwnerCount >= 2) {
+            require(newOwner0 != newOwner1);
+        }
+        if (newOwnerCount >= 3) {
+            require(newOwner0 != newOwner2);
+            require(newOwner1 != newOwner2);
+        }
+        if (newOwnerCount >= 4) {
+            require(newOwner0 != newOwner3);
+            require(newOwner1 != newOwner3);
+            require(newOwner2 != newOwner3);
+        }
+        if (newOwnerCount >= 5) {
+            require(newOwner0 != newOwner4);
+            require(newOwner1 != newOwner4);
+            require(newOwner2 != newOwner4);
+            require(newOwner3 != newOwner4);
+        }
+
+        // continue KoRoot at output 0 with the NEW config; nonce preserved.
+        validateOutputState(0, {
+            proposalNonce: proposalNonce,
+            threshold: newThreshold,
+            ownerCount: newOwnerCount,
+            owner0: newOwner0,
+            owner1: newOwner1,
+            owner2: newOwner2,
+            owner3: newOwner3,
+            owner4: newOwner4
+        });
+
+        // Bound leakage of the root reserve to maxProposalFee — the same floor
+        // createProposal applies to its two id-bearing outputs, summed over the
+        // whole root-input SET for the reason given there: one copy of this script
+        // runs per root UTXO and they are all satisfied by the same output 0. The
+        // proposal input is deliberately NOT in the sum — it pays a different
+        // address, and its own reserve is released when KoProposal.execute consumes
+        // it. One residue is left on purpose: sibling roots that share this
+        // one's nonce but hold a DIFFERENT owner set can co-validate here (the config
+        // written to output 0 comes from the call args, not from state) and they pay a
+        // different address, so the walk does not see them. Reaching that state needs a
+        // forked lineage — two root UTXOs under one treasury id — which the output
+        // pinning above is what stops from ever being minted.
+        byte[] rootSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        int inVal = 0;
+        for (i, 0, tx.inputs.length, maxTxInputs) {
+            if (tx.inputs[i].scriptPubKey == rootSpk) {
+                inVal = inVal + tx.inputs[i].value;
+            }
+        }
+        require(tx.outputs[0].value >= inVal - maxProposalFee);
+    }
+}

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Ko-sign whitepaper — an M-of-N multisig enforced natively by Kaspa L1 covenants (Toccata / KIP-10 / KIP-20), operated entirely from the browser." />
+<meta name="theme-color" content="#060a10" />
+<title>Ko-sign Whitepaper — Multisig enforced by Kaspa L1 covenants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --teal: #49eacb; --teal-2: #70c7ba; --cyan: #2bd3e6;
+    --bg: #060a10; --bg-2: #0a1018; --panel: rgba(18, 28, 40, 0.66);
+    --line: rgba(73, 234, 203, 0.16); --text: #e8f1f3; --muted: #7e93a3;
+    --warn: #f4c761;
+    --mono: "Fira Code", ui-monospace, "SF Mono", Menlo, monospace;
+    --sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); -webkit-font-smoothing: antialiased; line-height: 1.75; }
+  .bg { position: fixed; inset: 0; z-index: -1;
+    background: radial-gradient(60vw 60vw at 12% -10%, rgba(73,234,203,.12), transparent 60%),
+                radial-gradient(50vw 50vw at 100% 0%, rgba(43,211,230,.08), transparent 55%), var(--bg); }
+  .bg::before { content: ""; position: absolute; inset: -2px;
+    background-image: linear-gradient(rgba(73,234,203,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(73,234,203,.045) 1px, transparent 1px);
+    background-size: 44px 44px; mask-image: radial-gradient(circle at 50% 20%, #000 0%, transparent 75%); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px clamp(16px, 4vw, 36px) 90px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 26px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; letter-spacing: -.02em; color: var(--text); text-decoration: none; }
+  .brand .dot { width: 24px; height: 24px; border-radius: 8px; background: linear-gradient(135deg, var(--teal), var(--cyan)); box-shadow: 0 0 18px rgba(73,234,203,.6); }
+  .brand .grad, h1 .grad { background: linear-gradient(90deg, var(--teal), var(--teal-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .btn { font-family: var(--mono); font-size: 12.5px; border-radius: 10px; padding: 9px 16px; text-decoration: none; border: 1px solid var(--line); color: var(--teal); background: rgba(73,234,203,.06); }
+  .btn:hover { background: rgba(73,234,203,.12); }
+  .kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: var(--teal); text-shadow: 0 0 12px rgba(73,234,203,.4); margin: 42px 0 4px; }
+  h1 { font-size: clamp(30px, 5.4vw, 44px); letter-spacing: -.03em; line-height: 1.12; margin: 10px 0 8px; }
+  .sub { color: var(--muted); font-size: 15px; max-width: 640px; }
+  .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; margin-top: 14px; }
+  .meta b { color: var(--teal-2); font-weight: 600; }
+  h2 { font-family: var(--mono); font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); margin: 52px 0 12px; text-shadow: 0 0 12px rgba(73,234,203,.35); }
+  h2::before { content: "⟨ "; color: var(--muted); } h2::after { content: " ⟩"; color: var(--muted); }
+  h3 { font-size: 15.5px; margin: 26px 0 8px; }
+  p, li { color: #c6d4da; font-size: 14.5px; }
+  li { margin: 5px 0; }
+  b { color: var(--text); }
+  code { font-family: var(--mono); font-size: 12.5px; color: var(--teal); background: rgba(73,234,203,.06); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; }
+  pre { font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--teal-2); background: #04080c; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-x: auto; box-shadow: 0 14px 40px rgba(0,0,0,.4); }
+  pre b { color: var(--teal); font-weight: 600; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; backdrop-filter: blur(14px); margin: 16px 0; }
+  .warnbox { border-color: rgba(244,199,97,.35); }
+  .warnbox b { color: var(--warn); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+  th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 8px 10px; border-bottom: 1px solid rgba(73,234,203,.07); color: #c6d4da; vertical-align: top; }
+  td:first-child { font-family: var(--mono); color: var(--teal-2); white-space: nowrap; }
+  .foot { margin-top: 70px; padding-top: 20px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .foot a { color: var(--teal); text-decoration: none; }
+  .ok { color: var(--teal); } .no { color: #ff8f8f; }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+
+  <nav class="top">
+    <a class="brand" href="./"><span class="dot"></span><span>Ko-<span class="grad">sign</span></span></a>
+    <a class="btn" href="./">← back to app</a>
+  </nav>
+
+  <div class="kicker">whitepaper · v1</div>
+  <h1>Multisig, <span class="grad">enforced by Kaspa L1</span></h1>
+  <p class="sub">Ko-sign is an M-of-N treasury whose rules are not a promise made by software —
+  they are consensus rules. Every proposal, approval, rejection and execution is a covenant
+  transaction validated by every Kaspa node.</p>
+  <div class="meta">status <b>experimental · live on testnet-10</b> · stack <b>Toccata · Silverscript · KIP-10 · KIP-20</b></div>
+
+  <h2>1 · Abstract</h2>
+  <p>Multisignature custody normally lives in one of two places: a smart-contract account on an
+  account-based chain, or an off-chain signature-collection ritual around a P2SH script. Ko-sign
+  takes a third path made possible by Kaspa's <b>Toccata</b> upgrade: the multisig itself is a set of
+  interlinked <b>UTXO covenants</b>. The M-of-N policy, the proposal queue, the per-owner approval
+  bitmaps and the payout rules are all state carried by on-chain outputs, and the only way that
+  state can move is along transitions the script — and therefore the network — permits.
+  The reference client is a pure browser application: it builds covenant transactions in
+  WebAssembly, signs them locally with BIP340 Schnorr, and submits them directly to a public
+  Kaspa node over JSON wRPC. There is no backend, no custodian, no admin key.</p>
+
+  <h2>2 · Why covenants, not signatures</h2>
+  <p>A classical <code>multisig</code> script says: <i>“M of N signatures can spend.”</i> Everything
+  else — what is being approved, who has signed so far, whether an approval was reused — lives
+  off-chain and must be trusted. A covenant flips this: the output itself constrains the
+  transaction that spends it. With Kaspa's <b>KIP-10</b> transaction introspection a script can read
+  the spending transaction's outputs, and with <b>KIP-20</b> a network-enforced 32-byte
+  <b>covenant id</b> ties a family of outputs to a common genesis. Ko-sign uses both to guarantee:</p>
+  <ul>
+    <li>the vault can <b>only</b> be spent together with an <b>Approved</b> proposal of the <b>same covenant lineage</b>;</li>
+    <li>a proposal can only advance by one legal step at a time — sign, reject, execute, or expire;</li>
+    <li>each owner's approval is recorded in an on-chain bitmap, so approvals cannot be duplicated or replayed;</li>
+    <li>the payout must match the proposal — recipient, amount and fee ceiling are enforced by script.</li>
+  </ul>
+
+  <h2>3 · Architecture</h2>
+  <p>A treasury is three covenant scripts sharing one covenant id, minted together by a single
+  <b>genesis</b> transaction:</p>
+  <pre>
+        genesis tx  ──┬── output 0 → <b>KoRoot</b>   (policy + nonce + owner set)
+                      ├── output 1 → <b>KoVault</b>  (the vault that holds funds)
+                      └── output 2 → change
+
+  <b>KoRoot</b>   carries state: nonce · threshold · ownerCount · owners[5]
+             spending it = creating a proposal, or applying a signer change
+  <b>KoVault</b>  holds funds at a FIXED address; spendable only alongside an
+             Approved KoProposal of the same covenant id
+  <b>KoProposal</b> one per proposal: operation, recipient hash, amount,
+             max fee, expiry, approval/reject bitmaps, status</pre>
+  <p><b>State encoding.</b> Root state is a compact push sequence —
+  <code>enc(nonce) · enc(threshold) · enc(ownerCount) · 5 × enc32(owner)</code> — with unused owner
+  slots padded by a NUMS point (a public key with no known private key, so padding can never
+  sign). Because owners and threshold are <i>state</i>, not part of the address, the signer set can
+  change while the vault address stays fixed.</p>
+  <p><b>Unique addresses.</b> Each treasury embeds a random 32-byte salt in the vault script, so two
+  treasuries with identical owner sets still get distinct deposit addresses. The root and proposal
+  scripts are salt-agnostic; clients disambiguate by covenant id and by walking outpoints from
+  the genesis transaction.</p>
+
+  <h2>4 · Proposal lifecycle</h2>
+  <pre>
+  <b>propose</b>   owner spends KoRoot → new Root (nonce+1) + Proposal P₀
+            witness: proposer, sig, operation, recipient-hash, amount,
+                     maxFee, expiresAt, executionDelay
+            the proposer funds the proposal bond from their own wallet
+  <b>approve</b>   owner spends Pᵢ → Pᵢ₊₁ with their bit set, count+1
+  <b>reject</b>    owner spends Pᵢ → Pᵢ₊₁ with a reject bit; once approval can
+            no longer reach M, status becomes Failed
+  <b>execute</b>   count ≥ M: ANY owner spends Vault + Proposal together;
+            the covenant forces an output paying exactly the proposed
+            amount to the proposed recipient, and a vault continuation
+  <b>close</b>     past expiry, the proposal can be closed and the bond reclaimed</pre>
+  <p>Status is a pure function of the bitmaps: <code>Pending → Approved</code> when
+  <code>count ≥ M</code>, <code>Pending → Failed</code> when <code>N − rejects &lt; M</code>. Every
+  transition is one transaction, so the full audit log — who signed what and when — is
+  reconstructible from the DAG alone.</p>
+  <h3>Signer changes at a stable address</h3>
+  <p>Changing owners or threshold is <code>operation 2</code>: a config proposal commits to the new
+  set via a hash (<code>config_commit(threshold, count, owners)</code>) published in the proposal, and
+  the human-readable set travels in the transaction payload for other clients to verify against
+  that commitment. Once approved, applying it spends the KoRoot and installs the new owner
+  state in the continuation — same covenant id, same vault address, new policy.</p>
+
+  <h2>5 · On-chain recovery</h2>
+  <p>The genesis transaction carries a compact <b>KOSGN inscription</b> in its payload:</p>
+  <pre>"KOSGN" · version · threshold · ownerCount · salt[32] · owners[32 × n]</pre>
+  <p>Given nothing but a vault address, any client can find the genesis via a public indexer,
+  decode the inscription, rebuild all three covenant scripts, and locate the live KoRoot by
+  walking its spend history from genesis — picking up every signer change on the way. A treasury is
+  therefore recoverable from the chain alone: no server, no database, no backup file.</p>
+
+  <h2>6 · Client architecture — zero backend</h2>
+  <pre>
+  browser ──(wasm)── builds covenant txs          tools/wasm-tx (Rust → WASM)
+          ──(BIP340)─ signs sighashes locally      key never leaves the tab
+          ──(JSON wRPC)─ submits straight to a     public node picked via
+                         Kaspa node                kaspa-resolver, or your own
+          ──(REST indexer)─ rebuilds queue,        api.kaspa.org / api-tn10
+                         history & audit logs      localStorage = cache only</pre>
+  <p>Everything the UI shows — balances, the proposal queue, per-proposal audit logs, signer
+  activity — is derived from chain data. Local storage is a cache; deleting it loses nothing.
+  The same property gives multi-device consistency for free: a co-signer on a cold machine opens
+  the vault URL and the client reconstructs the treasury from the DAG.</p>
+
+  <h2>7 · Security model</h2>
+  <table>
+    <tr><th>property</th><th>enforced by</th></tr>
+    <tr><td>funds move only via Approved proposal</td><td>covenant script + Kaspa consensus</td></tr>
+    <tr><td>approval uniqueness / no replay</td><td>on-chain bitmaps in proposal state</td></tr>
+    <tr><td>proposal ↔ vault binding</td><td>KIP-20 covenant id (network-enforced)</td></tr>
+    <tr><td>payout correctness (recipient, amount, fee cap)</td><td>KIP-10 introspection in the execute path</td></tr>
+    <tr><td>sweep value preservation (no fee-burn griefing)</td><td>the deposit path requires the consolidated output to keep <b>every sompi</b> of the vault inputs — the sweeper funds the network fee</td></tr>
+    <tr><td>key custody</td><td>your browser — raw keys sign locally and are never transmitted</td></tr>
+    <tr><td>data availability</td><td>the Kaspa DAG itself (+ any public indexer)</td></tr>
+  </table>
+  <p>The client is untrusted infrastructure: a malicious frontend or node can censor or lie about
+  state, but cannot move funds — no set of transactions it could craft will validate without M
+  legitimate owner signatures over the covenant's sighashes. The main residual risks are those of
+  any key-based system (owner key compromise up to M−1 is tolerated by design) and the usual
+  caveats of experimental script primitives on a testnet.</p>
+
+  <h2>8 · Wallet connectivity</h2>
+  <p>Two connection modes exist today. A <b>manual raw key</b> is the full covenant signer — it can
+  propose, approve, reject and execute. <b>KasWare</b> connects as an owner identity and can deposit
+  into the vault (<code>sendKaspa</code>) and display balances, but its <code>signPskt</code> API only signs
+  inputs of the wallet's own addresses, so it cannot yet sign covenant P2SH inputs — the client
+  states this limitation explicitly. Hardware wallets and further extensions are future work.</p>
+
+  <h2>9 · Limitations & roadmap</h2>
+  <ul>
+    <li><b>Testnet-first.</b> Covenants ship with Kaspa's Toccata line; Ko-sign runs live on testnet-10 and follows the upgrade path toward mainnet.</li>
+    <li><b>Compiler in the browser.</b> Covenant scripts are compiled ahead of time; moving the Silverscript compiler itself to WASM removes the last build-time dependency.</li>
+    <li><b>Wallet signing.</b> Covenant-aware signing in extension/hardware wallets (raw-sighash or covenant-aware PSKT) would retire the manual-key requirement.</li>
+    <li><b>Formal verification</b> of the three scripts, and third-party audit, are open items before any mainnet deployment with real value.</li>
+  </ul>
+
+  <h2>10 · Conclusion</h2>
+  <p>Ko-sign demonstrates that a serious custody primitive — proposal-based M-of-N treasury
+  management with mutable signer sets, on-chain audit logs and chain-only recovery — can be built
+  on a pure UTXO BlockDAG with nothing but script, and operated with nothing but a browser.
+  The policy is not in a database and not in a contract account balance: it is in the outputs,
+  where every Kaspa node checks it, block by block, in seconds.</p>
+
+  <div class="panel warnbox"><b>⚠ experimental software.</b> Ko-sign is research-grade and currently
+  deployed on Kaspa testnet-10. Do not use it to custody meaningful value until the underlying
+  network upgrade and the scripts themselves have been audited and reach mainnet.</div>
+
+  <div class="foot">
+    <span>Ko-sign · Kaspa L1 covenant multisig · whitepaper v1 · 2026</span>
+    <span><a href="./">app</a> · <a href="https://github.com/ko-sign/kosign" target="_blank" rel="noreferrer">source</a></span>
+  </div>
+</div>
+</body>
+</html>

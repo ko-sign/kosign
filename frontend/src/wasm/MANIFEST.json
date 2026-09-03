@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "toolchain": {
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)",
+    "wasmBindgen": "0.2.100",
+    "clang": "Homebrew clang version 22.1.8"
+  },
+  "sources": {
+    "tools/wasm-tx/src/lib.rs": "04cf49f8bbf587311482139157796d1e7b11902d478b7a67421b407d6d971336",
+    "tools/wasm-tx/Cargo.toml": "9392e0ad33da39b7442b2e87f69604858230591af5e9c2833ae61299a082f8eb",
+    "tools/wasm-tx/Cargo.lock": "e22d4d294c73cea7a0c64bd0ebfdba623f29611bc0150cd764a65550a07abfac",
+    "tools/wasm-tx/rust-toolchain.toml": "a8b7a82e59d863d924d2e906816ef1d30585e24bdedf7e95141b9b70cfe5d0c0",
+    "tools/wasm-tx/.cargo/config.toml": "5cb66d574f779b9b7c2ae504ffd9a8b90438c6c83dc13ee2a1f6779be4167f04"
+  },
+  "artefacts": {
+    "frontend/src/wasm/kosign_wasm_tx_bg.wasm": "f2cc2e3140316edcd3b33702fc41b1491f31b8d36ba08e3b74dc38f997d5d76f",
+    "frontend/src/wasm/kosign_wasm_tx.js": "f29f4c746ee587f1ac4547a00df7fc7a2ab4de4dbc27ae62244d172e2f1e5648",
+    "frontend/src/wasm/kosign_wasm_tx.d.ts": "7480b4d31c6fef9a273bcf1463791cd15829884a82db10561b00b029af26c7ea",
+    "frontend/src/wasm/kosign_wasm_tx_bg.wasm.d.ts": "9cd4840651bc7889df7758cbbe8b50194c793e2141b25af283415e200946d43d"
+  }
+}

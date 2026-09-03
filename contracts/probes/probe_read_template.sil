@@ -1,0 +1,30 @@
+pragma silverscript ^0.1.0;
+
+// PROBE 4 — cross-template foreign input read.
+//
+// Verifies `readInputStateWithTemplate(idx, prefixLen, suffixLen, expectedHash)`:
+// decode another input that uses a DIFFERENT contract template, while the builtin
+// checks (a) the foreign input's template hash == expectedHash and (b) the
+// claimed redeem-script bytes match the foreign input's P2SH scriptPubKey.
+//
+// This is exactly how KoVault reads an approved KoProposal: different
+// template, same covenant domain. prefixLen/suffixLen/expectedHash come from the
+// KoProposal compiled artifact (see packages/descriptor).
+contract ProbeReadTemplate(byte[32] expectedHash, int prefixLen, int suffixLen) {
+    // readInputStateWithTemplate binds into a DECLARED struct (not inline
+    // destructuring). The layout must match the foreign contract's state.
+    struct ForeignState {
+        int status;
+        int approvalCount;
+    }
+
+    entrypoint function spend(int foreignIdx) {
+        // same covenant lineage as me
+        require(OpInputCovenantId(foreignIdx) == OpInputCovenantId(this.activeInputIndex));
+
+        // decode the foreign proposal-shaped state and assert a field
+        ForeignState f = readInputStateWithTemplate(foreignIdx, prefixLen, suffixLen, expectedHash);
+        require(f.status == 1);       // Approved
+        require(f.approvalCount >= 1);
+    }
+}

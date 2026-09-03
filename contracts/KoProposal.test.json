@@ -1,0 +1,3487 @@
+{
+  "tests": [
+    {
+      "name": "approve REJECTS a continuation that rewrites the payment amount (the vote would approve one sum and the vault release another)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xa04e4e10891ac400dc4deb0666c91a6399cec6d2ed6e54611b47ae55306c256e10281248fc80e141ba4dd86345dbbd56471cfeecbf7ea7b7c4926c466d90601001"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2054a1075168db99d5af783a4e293cc6f7e5ee974d2f4968e7fa52ede7e8c77f8887",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that rewrites the recipient the proposal committed to",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xa52ceb179c0d439c9dc4d48bf23421b463253f69bd12f4f7aff27bbddaac5e6e51ccccf7c44fdd6310a04d558bfec21be68cb7845723a0d0f618975b79a02fc401"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa209b34528a10489465f589cc0466623ec355668d2f34291b4d2c8e86941113d66b87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that raises the fee cap the proposal was approved under",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xedb7747165dde6ab7cd33bc1fdf55f77da2eb143c519506c872f58d5323c95efddba485106a516b7339b2deb755781244fa9e5fdf6432212ac146391ec76efd401"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20feea6bdf173bc28ea32d1ab2c9dda1855a28b9f5b9eb3b44fa97668ba53413a987",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that changes the operation from TRANSFER to CONFIG",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x2fd29b027630d9f943aae48d6d82b4f3a9e72e791a1058cd031ad1c8271f0b74d71ed99f0329622fe0ab6655835b9ac27c23b49e0b3f0f666d168608798e2cfa01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20315d70214ce84cfa7ab7cce9ccbe1f25bca15111bbb967f7f3cc27ebabe2837287",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that renumbers the proposal (a vote replayed onto another id)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xa1d38d7fb6677b4480d72aecea11117471889216379ad981273c2f89b0189a8c19155f7096b943ab5d6ca160b7abb09d5883d5d752a86de558a838db1c164d8801"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa206d12730607825bb5f9561c56a878ddf0325d04ba2d75bcea35f1556617c05cda87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that pushes the expiry out",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x95cdb81c04f9fcf60bbeacb5ca2cb65e5e70c5ddc088a2154c5ead20c2a687e06512acc30738bd6b78b963288044e6339764d521d4876588816e7d17e30c7d7301"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa206d39f0b04d88a37254130137ce9b20d72adef3afc104e175d57d9facde815c8287",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that adds an execution delay the approvers never agreed to",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xae8cff30ce241fe0b7d50aa7eeac376ed5c67e56c37b933c88387605b52c391dd3849a26aef3793bffba510bc39fee2be5a2f69383b7d31cb477df46fbb6190501"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2055e490083847e04d9569560ded6ffb7263649cf06990f9cca76276d2c239d3b687",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that lowers the snapshot threshold so fewer votes suffice",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xff3e09c24735986961778182484085538f29368ca7f2a559fe804814dba240f878c97f97325e371bf6c7b834ae94b0ed9ada4bb261a4571f264ff74392ccfc9b01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20d03ea3ad31a11eec59a243f924e50e2551aae985b00e50e11ac23bf5234bb5db87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that inflates the approval count past the bits actually set",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xca511f18e74e76050fd18aa91feddc42da4dec8617603976dfd669829a6a8122ad0126625a6c7e600b9f213a1af4593a8be747bb686e79ef90825c168602a45901"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa200ef0c819f6cef946f1fdb9ef1231ab11513df602ddebf7632852bf8916131b1e87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that erases a rejection already on the record",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0400000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xa23d63d31349f80fc704d33bd6e211240ad111f3054cccdfb7fd84bc9396759d8bf3ec5bc10e6f5d86d166b0ad0d65214c6822fe556ece7c58ec6dfdfd9ef43701"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a continuation that rewrites the payment amount",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x02fe43d5c9125acbf0f2a3dc4e9afb2ead439753e5b904a17a4ce9feeeb63eee7b779f082b21d540489387a44002cd2c6fae31e348d28a0a1546f8958c990f5501"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa201f21942f90762267d783453a38fa0d67c454206f366ff94fffd724943e327bd187",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a continuation that rewrites the owner snapshot",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x4d05a99f775147ecc4063d503bfa07ba4c2e7ba545d4e6e3d18f80adad1224fe1b8591451933649ca94713220e772b435aa68b81846c7787e5a67f038bd4690201"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20f9c9283c408fbb7912883afd04c3776b34a10db3fa17ddf738aa7512124109fb87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a continuation that quietly drops the approvals already cast",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x8dc87c34126f7065a697cc61c90e61338c4062a479e6632bdc73c1ed2c7f786680306381132d83049cb718e509576b626beea9059eee12287ed686654367c9a101"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20be56f02d7f0cc99f1b21768ec0d99c08fe4da208ba52cba99a42895ea5e09ba287",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve records owner 1’s approval and turns a 2-of-3 proposal Approved",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x8515a91e74bcb66cd26a50975f25380437779b521cf61e8e7d52d0a71e64e788f97048f8c86285529a81e4bb4734dc084dcbff4865e02566e5807263e0b8bf4101"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve leaves a 3-of-5 proposal Pending until the threshold is actually met",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        3,
+        5,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x62292736b79f67ae188517444c79cf2b986a77cd085f4e0e929fdab017bf067e63c4a744f9dbdca0352ebc772353ba289b86f67d470e86d5ee3469a2907bd84e01"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2070050b4befe1aa17edf5b61418f8df3efe817d1020efb0d59af3872d3478891887",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve accepts spending exactly the proposal’s maxFee from its reserve",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x8515a91e74bcb66cd26a50975f25380437779b521cf61e8e7d52d0a71e64e788f97048f8c86285529a81e4bb4734dc084dcbff4865e02566e5807263e0b8bf4101"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS draining the proposal reserve beyond its maxFee",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x36f90f906e55413a9dd97691371f0ae73bee48576ab0a70809c1690ae16d275139bf9323c7101304abd92a595c54674fec6a303c224b0ef3e587067a93ca430f01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 79999,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS ownerIndex out of range",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        3,
+        "0x8515a91e74bcb66cd26a50975f25380437779b521cf61e8e7d52d0a71e64e788f97048f8c86285529a81e4bb4734dc084dcbff4865e02566e5807263e0b8bf4101"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a negative ownerIndex (which would alias owner 0)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        -1,
+        "0x9fb748529f7d92feb8cb875ae67b58e4a685c0c9ff1c00ecdd6cbc8a2e86bc4de8327c7a9c0bfcf973515cee7c98c1b92aa8760829ce62a47c3cd5a6e1cee5f201"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2001e10f2bde79e522358a5cab5d1fe64b20b6944dcbf2711b7d4dd541b4a1b05687",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS when not Pending",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x76e1c0888a2503033f14716b7ce0100b7c24691f9ca30e676cdf736b5a901f324f33ece89fff489ded075e42021c12ad1ac1d26a53ada1e455ae5d9a169ebab101"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS duplicate approval (bit already set)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        0,
+        "0x9fb748529f7d92feb8cb875ae67b58e4a685c0c9ff1c00ecdd6cbc8a2e86bc4de8327c7a9c0bfcf973515cee7c98c1b92aa8760829ce62a47c3cd5a6e1cee5f201"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2001e10f2bde79e522358a5cab5d1fe64b20b6944dcbf2711b7d4dd541b4a1b05687",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS approving after rejecting (owners vote approve XOR reject)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0200000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x20dfd8e11778822d967f7759318d194c5a56f27956e0c0b4e595ef32e68d4184ef32764dfee12eb6fa79fde1ba7a436adb2fa6ebd2a834edb870f9c746b44f9b01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20e96f40d10da6d7f081d75e8953225361166d6f95bef03e4e60affee8c2f1764d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS owner 0’s signature presented as owner 1",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x86694ce4230f59941d34154f2b28830a863e3a5c6d4fd9ca3b5c70883688517f67acbc403895ba75b25bd2b7895a782f7892d3336cafd399df60fe001cbbe24c01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a garbage signature",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that records the vote but leaves the proposal Pending (below-threshold status is not the signer’s to choose)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xb3624e941cd57b9904205a965b87ec67741e25078e5581cd6e03be4307724bb68f9f8d5ea0d91c30b9c53ccf6f6508225fe515482c13096f5619bcc3e863f87101"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa202ef403c8ac1eadd0e5b73b17ea7d7de8565a4a9409fcd35e8a7adb3d9f736fb487",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a continuation that rewrites the owner snapshot",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x0630ec7b76eca36ec6ab33fdd49722fe5708c03bff191bb5bb9a482f21b12df6c28ba7c8793b14f84a8cebf803c520a62ae43ce6dbf0e528839f3ec8d25a922701"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2042475b79ea41a18d66403ac0bad917e3ad48dedeefcc7e5c1e1a14ab744302cd87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a snapshot claiming ownerCount 99 (ownerAt/maskFor fall through to owner 0 past the last slot, and an inflated count makes `ownerCount - rejectCount < snapThreshold` unreachable — the proposal could never be Failed)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        99,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x123f44357ff688c43b27d18d4a9aed4febb6ae0f0fae484ccf43e9c4e15984af97a6274913820247c0ddc294fd43d19c625e0d194d974e9ca0d6a5150f8e3fa101"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20919a3bcf12d9efbe77629d4225d87a09a41ab6d08b15de516c9a485ee4b0a54f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a snapshot with ownerCount 6 (one past the five slots the state carries)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        6,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x07de9042f4452dbada480fe20818a8c39ddd9e1f2f20b62cfa347653bba421ac9bae30f57bd5478489f73364cd61db5421bffbd16c2c017a942e630b9867165501"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20e98fc8a00d5f4f4a1f849732e74d647c8be7dfae6349642d560b8f8313fd789187",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a snapshot with ownerCount 0",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        1,
+        0,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        0,
+        "0xe325b80bcea9ca215058dab819d6726e0d2b3a98f4c5a9cd32fa94800f51ebb30bc7dffa991788522ebfdbb6b206f9e776c89b6498260110bd8bbb7e8cc9c12b01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa203c237c2c48b77fd02edcb7f890eba921525b2353d4510802f7b9d38a55d0df6c87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a snapshot with snapThreshold 0 — the first single vote would satisfy `newCount >= snapThreshold` no matter how many owners it names",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        0,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xab4c0c6adc790d51f33a15e07a747ce593ce9ac3dcb803ce4793e080c14086efa916bb27f6967c99fa00455b5388913028f1a1b43c64a7a7ebfce7fbe86865df01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20e3bf6fcdbae39806fdd94873f5698b399d8221bc03d434837b6d8c941a2082e987",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a snapshot whose threshold exceeds its owner count (no complete owner set could reach it, and the reject arithmetic starts out of range)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        4,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xbe41cda57133e4c7a54d97821b520b9b9d8d763b68003b390064174522d1e197731982c364a58496e47dd37b8aabeaeab583bfafe096366bd945cd058c44243f01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20218057b703af962d01e346ffed424521084fb4058f0826f6f410606ccbfee56087",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve accepts the boundary snapshot 5-of-5 (the bounds are a range, not a narrowing — a full five-owner treasury still works)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        5,
+        5,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x9ba42081df61a3bbd73097d353e7b76d266ca61c7320faa36fc135e7295881ac2a571ec7673c4c660821a3248a26bbe89da8b110741df965e2db2c89837f9d8401"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20a8c8906b06023f63ea3cce14a5a40d63c43418155fee1ebf0fd07dedc36896ab87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve accepts the boundary snapshot 1-of-1",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0000000000000000",
+        0,
+        0,
+        1,
+        1,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        0,
+        "0xb6f5d6f8bcbb19d5fe9de13ffa859f7f176525a0ac3372af061be9564c5bf3ac1c10ace5944ef48ba8e5a5cacb2328f04b0c12719f6188bd43fb1b09a6c9daa101"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20ea59da3eacda20bcfc45e69f76b699f7e20a5087c4a16e2b4c44f2ba1e8d112287",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve accepts a zero tally (approvalCount 0 with no bits set — the lower bound is a bound, not a narrowing)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0000000000000000",
+        0,
+        0,
+        3,
+        5,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x523aa1e5ff6e10db20035860376a7809b9fc3fac0afbfd036708d637f3ae11372ecc5a87490e2d088ad6522554346c3ec27d7785416501a6b4672021022e8f1701"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa206090464fe09989000883179d5a061c5e9d22940341ad3003a6c5d4c35377354b87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a tally with approvalCount below zero (the threshold then needs more approvals than the snapshot names owners, so the proposal could never be Approved by them)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        -1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xbce5d6788d53c2343f0cc1ff2c6362de393210a20aa16df9d8eff889db756370f031441d1112a62222e8c92341e16ad09bafa99f3d19b4b2ec6e1123c0503a2a01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2099c0248b2aff347681c827fd41f9b4120da36398edf321a8c753ef066bdec11f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a tally with rejectCount below zero — `ownerCount - rejectCount < snapThreshold` could then never trip, so a proposal naming the real owners could never be Failed by them",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        -1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x9b6ec5faa6f319fdaa30f589a9883a3bee7e1b14fa4696db0550efc9ff9cf47e3ec20fea2be21d65bcd6cb8bf0a307ce9444f196d9e04458694a3c0467900a7a01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20c4108c1037d19222c6261ca18e5ffaf995f95fe141ffd8b1334cb80e75c4e83587",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve accepts the last vote of a fully-voted 2-of-3, where the tallies together reach ownerCount exactly",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0400000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x0dca087179ea46005bcb1add3ad1a0e1aa496f2b4ba5a40ff2a9a40720e6ca7c100932d52597479eda4c27d8ec98894d9eee36ee0d908aed082548ed873049e001"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa207dff9d5abbda496de99bd7d0ff4b90f59a42649513f2c9ad69546cbfe1dd634387",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS a Pending proposal whose tally has already reached the threshold (Approved is a state this contract writes, not a label the minter may withhold)",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0500000000000000",
+        2,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x777976514d3129f7982e42281f8e89c55df2735f94f74827672e656695b4bca9fe6e48f5b4f67605a89491101c7b71a81baa9a284500936eb35069c1e5bdbda901"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa208e65c16f2e289fbe2bc159c2b68e59b9aa70f8eb024b71a3519080457f24c9b787",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS the same over-threshold Pending tally (both voting paths re-derive it)",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0500000000000000",
+        2,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x29334a15d82a6a37aa3f609974cbd841ac7bfde9f3a1937ae652b0eef257533408cc00765116f3cd32d768717a3943b8332561344d420e858f6df56395fc22ff01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20e6ae407850fe1706f252e4f55032c0737bc3f2b13c8fb8ad9dfb96022be5a85087",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject accepts the last rejection a 3-of-5 can still take (its tally leaves ownerCount - rejectCount exactly on the threshold)",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        3,
+        5,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x1800000000000000",
+        2,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x59b5cbb779ca592fe858852f9bd7e5f6ee15e1598c03208ca1f9a6c0e8772cee48b405d06c29c9efd14c0c7ee88904c54a988774f0a535494251a52ac3912c0801"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20f5edebea280b4ffe94e5b7bebcbd8729ac1195ab79b7dccb9dc813fa74b8352487",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a Pending tally with more rejections than a 3-of-5 could survive — the proposal it describes is one this contract would already have Failed",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        3,
+        5,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x1c00000000000000",
+        3,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xdcc898aae7fcda26618e8a520a4eb2e06451ff09492962859f2e99857b584a52c008533ee17b4b9085617a3cc877a1ada25310eedc53f3a4c36bf064b50cd2d401"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa203a2a742427623c578fdea2050551ff52f51528ef9b18fdf071bf85f738af514887",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS an UNBOUND proposal input (ZERO covenant id would pair with a forged sibling) [weak control: it fails at the right guard on the real contract, but cannot flip on a stripped mutant — deleting any line changes KoProposal’s redeem script and therefore its P2SH address, so the real signature this fixture carries stops verifying]",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x3b623e996aaf9169dadd9d57a0751b176a62e15a5d7641c2ca490ae12a50c165a3e57437cc3b650a597521d195254a78cf08f30b25562ff14191e06581ae44e401"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS minting a second output under the same lineage [weak control: it fails at the right guard on the real contract, but cannot flip on a stripped mutant — deleting any line changes KoProposal’s redeem script and therefore its P2SH address, so the real signature this fixture carries stops verifying]",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x055318341a4398aa5b642262ea244f579da73c4baa8a412622a43cad471a880b5941bc518dcd26a69e3b3dc97b9c126f30d5423eb051158ce37952a9f5a0ae3d01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          },
+          {
+            "value": 1000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "approve REJECTS continuing the lineage onto an output other than the proposal continuation [weak control: it fails at the right guard on the real contract, but cannot flip on a stripped mutant — deleting any line changes KoProposal’s redeem script and therefore its P2SH address, so the real signature this fixture carries stops verifying]",
+      "function": "approve",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xf5d03a022f388336d2b2503c3ed4a943b686937be96ffbf1747de8e76bc8feac90605796f5e12ae6f12128a9501f52d56ae441e102616c81cac6dcd5e33715c201"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20945846b044620ff96c75987c24e94f56fe6fc0356be4178cb6f9da8034f9d87f87"
+          },
+          {
+            "value": 1000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject records owner 1’s rejection; a 2-of-3 stays Pending while approval is still arithmetically possible",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xa099aa26c23491edc5240e70d582af5dc4c5aba8360bc3445ccad13003d3e4e7c4636c24baa1ee1d9b922cdae3372c833edc5a7bcd3149f278ae180564b5985e01"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa201d930eb0be774486237c6bf52cb42441d98b9d7ebe06b47d89aed89c3aa9ec3387",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject Fails the proposal once rejections make the threshold unreachable",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0400000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xd310dc755e0426aa6973a3a921a534fcbf7e1a593bd38370fb50c37fd01549b0cad8e700a5f1debb571f9e2d9b07dd8cd8353299ebe8e3a5aad59a22bdd37f2801"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20238a05f3e198e417a20c73971b53adb97ad70c46c273cb425df0d0f796b75da387",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS duplicate rejection (bit already set)",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0200000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0xda89c46bcb11d582ff81b4d64df9bf279307bd31cab39900fb01052d09d05d6d44ca6f1c58ebfcc3f6fd71e398206734f6c0af056c7fa334fe2c0b11d978cd9201"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2099f8842029ff73e9e07178d4bb5c73626ebd2c9dfc635fbaf0091c1b997cfe9587",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS rejecting after approving (owner 0 already holds an approval bit)",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        0,
+        "0x4a620104e384c7cd9651aa2392c84af9107a4280427479921e63a4241deb932750b5bfbfd67789b2481feccb314e9b46790c021c48845ad37700f4f9d7dcea8e01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2030597fc02d2ec182d1c2ecf11ab1b5e5b2b2f5289be1274fc79e6acc3e10d31d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a snapshot claiming ownerCount 99 — the inflated count is exactly what would keep `ownerCount - rejectCount < snapThreshold` from ever tripping, so the bound is checked before any vote is counted",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        99,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x208a7fdc8382b93d11cd80577a493a771e228e8699e0048e201cb266a9301b82ae2bef9355a3b595c793ff48f0daf2fc52df7e6f88c36dd7799283fff581e34c01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa20c3c9fa1fd53c25a4b01b018102bc600b61aab29565522cf6d4d25e4f8a9ff45887",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject REJECTS a snapshot with snapThreshold 0",
+      "function": "reject",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        0,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        "0x5494ded866339e916242f89e5fd13b54857efa1e71684c9e20e0194416ffbfd66d80c0f911dcd9c768e4a28ba024f566440ecefc439ecc16c88d6d0bc31f8a2e01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 80000,
+            "script_hex": "aa2042d0630e82db0b7241f9d5227bf69d178fc48959bf0ff774ae0ae1be720af7b587",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute accepts an Approved proposal spent with its paired covenant input, authorised by a snapshot owner",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0xb1b6a18fa4b25da393d88fb64a0e9c505eaacbefc8a7b229609b5ac7e3f1ea146d4702722fd44c20d8105280e5ec36356b6a534a45d557fb223e20a771d8f0e401"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "SECURITY execute REJECTS pairing a proposal with ITSELF to mint a lineage-bearing output (one owner would forge an Approved proposal for the whole treasury)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        0,
+        1,
+        "0x100ea375e129cf1d2b92f161bd83eb999b50cb8f995555b8ce9cd0639fe7a591d27ffbe5c89654feb79861d9af9fdd821e3888a82119b4ce14ab0a16faf8c3e801"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 1000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "SECURITY execute REJECTS a continuation parented by the PROPOSAL rather than by the paired contract (same mint, with the paired input present as cover)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x087c9a6f81c991bd1ed659af828f7ed8e0d01ebd34bc92d5bde7e60876669e53b9b6f89de3474ddda37049619012b5756d3929f2f76d7da4441511ba2af4605d01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a proposal that is not Approved",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x39bf0b68ac382db7c17feab7d99a410a73560eb1f1df2213a73ba2d450980ccbdbc889c3f3094b8334317f5ff23f01722553a1fba5e4ff3cb5cb7e37b7e8fa8d01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a paired input from a FOREIGN covenant lineage [weak control: it fails at the right guard on the real contract, but cannot flip on a stripped mutant — deleting any line changes KoProposal’s redeem script and therefore its P2SH address, so the real signature this fixture carries stops verifying]",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x087c9a6f81c991bd1ed659af828f7ed8e0d01ebd34bc92d5bde7e60876669e53b9b6f89de3474ddda37049619012b5756d3929f2f76d7da4441511ba2af4605d01"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a snapshot claiming ownerCount 99 (checked before the owner index is resolved, so index 5+ never reaches owner 0’s key)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        99,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x0160dd9f44b33630f702ee1c638412663fe0e277f120784366aa3a52d6f68546f041d8ce90cccfd8861d089ece7a5ec4398601628946e9e1ac8344bbd6f8db7301"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a snapshot with snapThreshold 0 (a status the proposal could have reached on one vote is not one the vault may act on)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        0,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0xcdd3caf2b751f707d07d991a8fc8bb2c0064c91189aec78450dfcc7cc38f0a7a70294ccac6b83ba8e115fd7c56a217dc59ea39215463424c18c33273f4e5767301"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute accepts an Approved proposal whose tallies reach ownerCount exactly (2 approvals + 1 rejection of 3 owners)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0400000000000000",
+        1,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x4fb84bd508e75e73ab829ce30f79ca56566016cd2e74b7c72b7a0f495277136e102056f18249412ac71fd29a7377ba1d2800324c6e7f4bb8f038853df1c4f89401"
+      ],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a tally larger than the owner count (approvalCount 1000 behind an empty bitmap — one owner, one vote, so the two tallies together can never exceed ownerCount)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0000000000000000",
+        1000,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0xd5f7954099d6f28f6a44d8478bc54b74749278947902ca7bb0e0e7494e60fcfffe6ff00e68966405691b0a3fa9fd11daaea8e490b65142b07603c4d219de352701"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS tallies that together exceed the owner count (2 approvals + 2 rejections of 3 owners) even though each is individually plausible",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0c00000000000000",
+        2,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x281f17fed83c8137f1ed4287c6688748e0448656f2b7d48fef25f96238b3c705f952e4303f149bc4f4c20ef9411c41407a04ee0f3eaa7ebc8ee94e10d53603d601"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS an Approved proposal whose tally is below its own threshold (KoVault and KoRoot act on `status == 1` and re-derive nothing, so it must mean what it says here)",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0xb5f9429d684e99c0faf0948e41318ad0bac3aadd185aacdd6ca0ecbbd9b784f778ac1cb8635306eace80597a623d91164a09a5caf5ceb1144759f83d8fb360e601"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute REJECTS a non-owner’s signature",
+      "function": "execute",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0300000000000000",
+        2,
+        1,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [
+        1,
+        1,
+        "0x1b9144d77ab5700cef442615faf561af3e311e46fd3ee1cc6410ab4812e897b26d0d3f7e868d6b97c6e1b31b95de138aae40e25e701e1ea2b10c497e61c7808901"
+      ],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "utxo_value": 5000000000,
+            "utxo_script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "signature_script_hex": "51",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 4000000000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "closeExpired retires an expired proposal — the WHOLE bond returns to the committed vault P2SH, unbound",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "closeExpired retires a proposal whose SNAPSHOT is malformed (ownerCount 99) — deliberately NOT bounds-checked here, because retiring the UTXO is the one thing still possible once the voting paths reject it",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        0,
+        99,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "closeExpired REJECTS a proposal that has not expired yet",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        9999999999,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "closeExpired REJECTS an already-closed proposal (status 3)",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        3,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SECURITY closeExpired REJECTS continuing the lineage onto the bond output (minting oracle) — destination and value are otherwise honest, so only the zero-continuation pin refuses this",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "SECURITY closeExpired REJECTS retiring the proposal while ANY output inherits the id, even alongside an honest unbound bond return",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          },
+          {
+            "value": 1000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87",
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "authorizing_input": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "SECURITY closeExpired REJECTS paying the bond anywhere but the committed vault P2SH — the closer bounty this replaces (expiry honest, value whole, lineage retired: only the destination rule refuses it)",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 100000,
+            "script_hex": "aa20c0ad80df1fc78ad16a79bcada9e2ae373d429b3c5f0a0c86ea591ee3e2423b1a87"
+          }
+        ]
+      }
+    },
+    {
+      "name": "closeExpired REJECTS returning the bond a thousand sompi short of the input set — the skim the closer bounty would become (right address, wrong value: only the value floor refuses it)",
+      "function": "closeExpired",
+      "constructor_args": [
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        1,
+        1,
+        "0x0707070707070707070707070707070707070707070707070707070707070707",
+        100000000,
+        20000,
+        0,
+        0,
+        "0x0100000000000000",
+        1,
+        0,
+        2,
+        3,
+        "0xc9f2bb96505ff29a7b1a723e2fb6e7b6e2b18da203d20fd1ed351f10ddfd6ebe",
+        "0x106c9afcaa12a8eb002d440bd493a63bf79c01790d6331d9a8d66b10dc9e6820",
+        "0x5a586a6483bec5b456e3776230b416e88a5e6152a50ca547f02e494adeaceda6",
+        "0xfd8f3e15a50200df23ea59e37da063305d6814a89829845c25a9fac058c649e0",
+        "0x3cfcbeca166e9786831587413db70fcde0ef10ca877f6efd4af5eee4c6df9382",
+        "0x0000000000000000",
+        0,
+        "0xce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d"
+      ],
+      "args": [],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [
+          {
+            "utxo_value": 100000,
+            "covenant_id": "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        ],
+        "outputs": [
+          {
+            "value": 99000,
+            "script_hex": "aa20ce57216285125006ec18197bd8184221cefa559bb0798410d99a5bba5b07cd1d87"
+          }
+        ]
+      }
+    }
+  ]
+}

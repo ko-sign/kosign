@@ -1,0 +1,44 @@
+{
+  "name": "kosign",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Ko-sign \u2014 Kaspa L1 covenant multisig wallet (on-chain proposal covenant, Gnosis-Safe-style)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter kosign-frontend dev",
+    "build:compiler": "bash scripts/build-compiler.sh",
+    "opensource": "bash scripts/make-opensource.sh",
+    "build:wasm": "bash scripts/build-wasm-repro.sh --write",
+    "build:frontend": "bash scripts/build-frontend.sh",
+    "verify:frontend": "bash scripts/build-frontend.sh --check-determinism",
+    "verify:deployed": "node scripts/verify-deployed.mjs",
+    "verify:wasm": "bash scripts/build-wasm-repro.sh",
+    "verify:wasm:host": "bash scripts/build-wasm.sh",
+    "compile:contracts": "bash scripts/compile-all.sh",
+    "verify:contracts": "npm run test:contracts",
+    "typecheck": "pnpm -r --filter './packages/*' typecheck",
+    "test": "npm run test:wasm && npm run test:unit && npm run test:packages && npm run test:contracts && npm run test:security && npm run test:js-guards",
+    "test:wasm": "node scripts/wasm-manifest.mjs",
+    "test:unit": "node --test frontend/test/*.test.mjs",
+    "test:contracts": "bash scripts/test-contracts.sh",
+    "gen:koroot-tests": "node scripts/gen-koroot-tests.mjs",
+    "gen:kovault-tests": "node scripts/gen-kovault-tests.mjs",
+    "gen:koproposal-tests": "node scripts/gen-koproposal-tests.mjs",
+    "gen:contract-tests": "npm run gen:koroot-tests && npm run gen:kovault-tests && npm run gen:koproposal-tests",
+    "test:packages": "pnpm -r --filter './packages/*' test",
+    "rpc:ping": "pnpm --filter @kosign/rpc ping",
+    "test:security": "bash scripts/test-security.sh",
+    "test:js-guards": "bash scripts/test-js-guards.sh",
+    "dev": "pnpm --filter kosign-frontend dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@10.11.0"
+}

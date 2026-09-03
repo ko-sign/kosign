@@ -1,0 +1,64 @@
+{
+  "gas": 0,
+  "inputs": [
+    {
+      "computeBudget": 10,
+      "previousOutpoint": {
+        "index": 1,
+        "transactionId": "be6288e9c53947279abeef00afd3029c0835ea052e8eed53512b98cb608117a5"
+      },
+      "sequence": 0,
+      "sigOpCount": 0,
+      "signatureScript": "41241fb581214bd3c9b75bf59da606ec5fc878a3cc7a81702f6be30f21d87eedc1af191fab5472e9b96febdc90dce49b4b86802d03a52043cc0b5805d1c367a2c301",
+      "verboseData": null
+    }
+  ],
+  "lockTime": 0,
+  "mass": 266666,
+  "outputs": [
+    {
+      "covenant": {
+        "authorizingInput": 0,
+        "covenantId": "8ff0e529655e0a5b6090c8e4d906fd85376d94b37ee90aac1b2a531f6bcd48e0"
+      },
+      "scriptPublicKey": "0000aa20fec29982419b06d3102f7b8aa056324b075d55888225ba13045274b9b7749f9387",
+      "value": 30000000,
+      "verboseData": {
+        "scriptPublicKeyAddress": "kaspatest:prlv9xvzgxdsd5cs9aac4gzkxf9swh243zpztwsnq3f8fwdhwj0exggfnzqxk",
+        "scriptPublicKeyType": "ScriptHash"
+      }
+    },
+    {
+      "covenant": {
+        "authorizingInput": 0,
+        "covenantId": "8ff0e529655e0a5b6090c8e4d906fd85376d94b37ee90aac1b2a531f6bcd48e0"
+      },
+      "scriptPublicKey": "0000aa201f49e4b8dda4a47ed6ac4640bb0454fd800acca2228467a8a4220d558e26940c87",
+      "value": 30000000,
+      "verboseData": {
+        "scriptPublicKeyAddress": "kaspatest:pq05ne9cmkj2glkk43rypwcy2n7cqzkv5g3ggeag5s3q64vwy62qcslse77fv",
+        "scriptPublicKeyType": "ScriptHash"
+      }
+    },
+    {
+      "covenant": null,
+      "scriptPublicKey": "0000208b4c2c1606b66a981d382a18b09bc7d68dab9c321d00b2f199a594a0dea89d39ac",
+      "value": 819989352932446,
+      "verboseData": {
+        "scriptPublicKeyAddress": "kaspatest:qz95ctqkq6mx4xqa8q4p3vymcltgm2uuxgwspvh3nxjefgx74zwnjul8qyjtu",
+        "scriptPublicKeyType": "PubKey"
+      }
+    }
+  ],
+  "payload": "4b4f53474e010102d6f2cfa410fa2558cd255b8a2e746c4f5d88a484207f8444d3879a837198ba9f8b4c2c1606b66a981d382a18b09bc7d68dab9c321d00b2f199a594a0dea89d399ee0065d79b74ae7b0bd7559e9a1aec1853870d04717df90f26102befd0a5822",
+  "storageMass": 266666,
+  "subnetworkId": "0000000000000000000000000000000000000000",
+  "verboseData": {
+    "blockHash": "9250b46c2278bf34f3e8007d4a0135dc2304f96b9dba018f01e950cf266294a1",
+    "blockTime": 1787107718863,
+    "computeMass": 2644,
+    "hash": "f30a21b3497d3481e751d73ece0ce21c22a6227ef018002239ff293821be927f",
+    "transactionId": "38d06bdcb0c283ecb684325d40075703ced62ccadf544dbe8cbb0384dcf3ff72"
+  },
+  "version": 1
+}

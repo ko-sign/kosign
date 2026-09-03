@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "step continues state count+1",
+      "function": "step",
+      "constructor_args": [5, "0x0102"],
+      "expect": "pass",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [{ "utxo_value": 100000, "state": { "count": 5, "tag": "0x0102" } }],
+        "outputs": [{ "value": 99000, "state": { "count": 6, "tag": "0x0102" } }]
+      }
+    },
+    {
+      "name": "reject wrong continuation (count not bumped)",
+      "function": "step",
+      "constructor_args": [5, "0x0102"],
+      "expect": "fail",
+      "tx": {
+        "active_input_index": 0,
+        "inputs": [{ "utxo_value": 100000, "state": { "count": 5, "tag": "0x0102" } }],
+        "outputs": [{ "value": 99000, "state": { "count": 5, "tag": "0x0102" } }]
+      }
+    }
+  ]
+}

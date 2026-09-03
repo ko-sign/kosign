@@ -1,0 +1,529 @@
+pragma silverscript ^0.1.0;
+
+// KoProposal — one proposal's on-chain state machine (Pending -> Approved,
+// then consumed by execution, or retired by closeExpired).
+//
+// MUTABLE OWNERS: owners + threshold are no longer baked into the script; they
+// live in the proposal's STATE as a snapshot taken from KoRoot at creation.
+// approve/execute checkSig against the snapshot (cast byte[32] -> pubkey). The
+// redeem script is therefore owner-agnostic, so the proposal TEMPLATE — and thus
+// the KoVault/KoRoot addresses that pin it — stay stable across owner changes
+// (see docs/OWNER-MANAGEMENT.md). A config change applies to FUTURE proposals.
+//
+// IMMUTABLE state-struct field order (must be mirrored byte-for-byte by the
+// KoProposalState struct in KoVault and KoRoot, and by the descriptor's
+// PROPOSAL_STATE_FIELDS):
+//   proposalId, operation, recipientSpkHash, amount, maxFee, expiresAt,
+//   executionDelay, approvalBitmap, approvalCount, status,
+//   snapThreshold, ownerCount, owner0, owner1, owner2, owner3, owner4,
+//   rejectBitmap, rejectCount, vaultSpkHash
+//
+// status: 0=Pending 1=Approved 2=Cancelled/Failed 3=Executed/Closed
+// Owners vote approve OR reject. When rejections make approval impossible
+// (ownerCount - rejectCount < snapThreshold), the proposal Fails (status 2).
+// operation: 1=TRANSFER_KAS, 2=CONFIG (recipientSpkHash carries hash of the new
+//   owner config; applied KoRoot-side at executeConfig).
+contract KoProposal(
+    byte[32] treasuryId,
+    int initProposalId,
+    int initOperation,
+    byte[32] initRecipientSpkHash,
+    int initAmount,
+    int initMaxFee,
+    int initExpiresAt,
+    int initExecutionDelay,
+    byte[8] initApprovalBitmap,
+    int initApprovalCount,
+    int initStatus,
+    int initSnapThreshold,
+    int initOwnerCount,
+    byte[32] initOwner0,
+    byte[32] initOwner1,
+    byte[32] initOwner2,
+    byte[32] initOwner3,
+    byte[32] initOwner4,
+    byte[8] initRejectBitmap,
+    int initRejectCount,
+    byte[32] initVaultSpkHash
+) {
+    // closeExpired's input walk shares KoRoot/KoVault's bounded window; the loop
+    // form also emits `require(tx.inputs.length <= maxTxInputs)`.
+    int constant maxTxInputs = 16;
+    // ---- mutable state (carried in the UTXO) ----
+    // approvalBitmap is byte[8] (not int): Kaspa's OpAnd/OpOr require equal-width
+    // operands, and state ints are fixed 8-byte while computed ints are minimal,
+    // so bitwise on int fails at runtime. byte[8] encodes identically (9 bytes).
+    int proposalId = initProposalId;
+    int operation = initOperation;
+    byte[32] recipientSpkHash = initRecipientSpkHash;
+    int amount = initAmount;
+    int maxFee = initMaxFee;
+    int expiresAt = initExpiresAt;
+    int executionDelay = initExecutionDelay;
+    byte[8] approvalBitmap = initApprovalBitmap;
+    int approvalCount = initApprovalCount;
+    int status = initStatus;
+    // owner snapshot (taken from KoRoot when this proposal was minted)
+    int snapThreshold = initSnapThreshold;
+    int ownerCount = initOwnerCount;
+    byte[32] owner0 = initOwner0;
+    byte[32] owner1 = initOwner1;
+    byte[32] owner2 = initOwner2;
+    byte[32] owner3 = initOwner3;
+    byte[32] owner4 = initOwner4;
+    // rejection tally (mirrors approval). Owners vote approve XOR reject.
+    byte[8] rejectBitmap = initRejectBitmap;
+    int rejectCount = initRejectCount;
+    // blake2b of THIS treasury's vault redeem script — the P2SH hash of the one
+    // stable address the treasury owns. Written by KoRoot.createProposal, which
+    // recomputes it from the hash-pinned vault template + the live covenant id
+    // (never taken from the proposer: the bond can be root-reserve-funded, so a
+    // proposer-chosen return address would let one owner drain the reserve
+    // 0.5 KAS per proposal). closeExpired pays the bond back to this script.
+    byte[32] vaultSpkHash = initVaultSpkHash;
+
+    // Select an owner pubkey by index from STATE (MAX_OWNERS=5), cast to pubkey.
+    function ownerAt(int idx) : pubkey {
+        byte[32] p = owner0;
+        if (idx == 1) { p = owner1; }
+        if (idx == 2) { p = owner2; }
+        if (idx == 3) { p = owner3; }
+        if (idx == 4) { p = owner4; }
+        return pubkey(p);
+    }
+
+    // bit mask for owner index as byte[8] (LE), so bitwise ops stay equal-width.
+    function maskFor(int idx) : byte[8] {
+        byte[8] m = 0x0100000000000000;
+        if (idx == 1) { m = 0x0200000000000000; }
+        if (idx == 2) { m = 0x0400000000000000; }
+        if (idx == 3) { m = 0x0800000000000000; }
+        if (idx == 4) { m = 0x1000000000000000; }
+        return m;
+    }
+
+    // ===========================================================================
+    // STATE SANITY — re-established by every entrypoint that ACTS on this UTXO's
+    // own state, because a covenant id does not prove KoRoot minted the UTXO. The
+    // genesis covenant group may bind an arbitrary number of outputs, so a
+    // treasury's creator (or a buggy tool acting for one) can plant a
+    // template-shaped proposal in the genesis transaction carrying ANY of the 19
+    // state fields it likes. KoRoot.createProposal bounds the snapshots IT mints,
+    // and approve/reject below preserve every bound they were handed, so on the
+    // honest path these are re-derivations of facts already established; they exist
+    // for the one UTXO nobody vouched for.
+    //
+    // WHAT THIS DOES NOT CLOSE — stated first, so the rest is not read as more than
+    // it is. None of this makes a PLANTED proposal safe, and no rule in this script
+    // can: the planter writes the owner snapshot too, so he names himself as a
+    // 1-of-1, plants status 1, signs his own execute, and every bound below holds
+    // with room to spare. Genesis planting is closed by verifying the genesis
+    // transaction — the treasury's covenant group must bind exactly the root and the
+    // vault outputs — which is off-chain work, not something a spend-time script can
+    // reach. What this script CAN do is bound the arithmetic, and the exact property
+    // the rules below buy is this: EVERY state this contract will act on is one that
+    // a fully self-consistent state — counts equal to the bits behind them — could
+    // equally present, with the same consequences. The residual is therefore exactly
+    // the planter's ability to forge VOTES, which no spend-time rule can reach, and
+    // NOT, on top of that, an ability to forge arithmetic no vote could produce. That
+    // distinction is the whole value here, and it is also (see below) precisely why
+    // tying the counts to the bitmaps is worth nothing.
+    //
+    // THE FIVE NUMBERS. ownerCount, snapThreshold, approvalCount, rejectCount and
+    // status are the whole decision surface: ownerAt()/maskFor() index on the first,
+    // the Approved and Failed transitions are inequalities over the next three, and
+    // the fourth gates which entrypoint may run at all. Bounding two of the five —
+    // which is all this function used to do — left the other three exactly as the
+    // minter wrote them, and that is not a cosmetic gap: a 3-of-5 planted with
+    // approvalCount 1000 and an EMPTY approvalBitmap passes an ownerCount/threshold
+    // check untouched (5 and 3 are both in range, no bit is set so the duplicate
+    // guard sleeps), and then ONE owner's approve computes newCount 1001 >= 3 and
+    // writes status 1. The bounds named the threat and did not close it.
+    //
+    // Together, the rules here and the two tally rules at the entrypoints pin the
+    // five numbers to the range an honest history can reach, and nothing else:
+    //     1 <= snapThreshold <= ownerCount <= 5
+    //     status 0 (Pending):   0 <= approvalCount < snapThreshold
+    //                           0 <= rejectCount  <= ownerCount - snapThreshold
+    //     status 1 (Approved):  snapThreshold <= approvalCount <= ownerCount
+    // Each rule and what it costs, measured as compiled script bytes (silc, the
+    // production compiler) — this script is revealed in the SIGNATURE SCRIPT of
+    // every approve, reject and execute, so every byte is paid on every vote:
+    //
+    //   ownerCount >= 1, ownerCount <= 5              (+0, already here)
+    //     ownerAt()/maskFor() are if-chains that FALL THROUGH to owner0 and bit 0
+    //     past the last slot, so `ownerIndex < ownerCount` alone admits indices 5,
+    //     6, … and authenticates every one of them against owner 0's key. The shared
+    //     bit keeps that from inflating approvalCount — a second vote under index 7
+    //     collides with owner 0's own bit — but the same inflation disables
+    //     rejection: `(ownerCount - rejectCount) < snapThreshold` never trips when
+    //     ownerCount is large, so a proposal minted with ownerCount 99 could never
+    //     be Failed. The owners it names could not vote it down at all.
+    //
+    //   snapThreshold >= 1, snapThreshold <= ownerCount   (+0, already here)
+    //     A zero or negative threshold makes the first single vote sufficient no
+    //     matter how many owners the snapshot names; a threshold above ownerCount is
+    //     one no complete owner set could reach, and it starts the reject
+    //     arithmetic out of range.
+    //
+    //   approvalCount >= 0                            (+15 bytes)
+    //     Negative is the threshold bound's mirror image and the two upper rules do
+    //     not reach it: approvalCount -1000 under a 3-of-5 needs 1003 approvals from
+    //     five owners who each get one, so the proposal can never be Approved. Not
+    //     theft — a proposal the named owners cannot pass is the same denial as one
+    //     they cannot fail, and this contract owes them both directions.
+    //
+    //   rejectCount >= 0                              (+12 bytes)
+    //     The same denial, aimed the other way and strictly worse: with rejectCount
+    //     -1000, `(ownerCount - newRejectCount) < snapThreshold` reads 1004 < 3 after
+    //     the first rejection and stays false forever, so a planted proposal naming
+    //     the real owners can NEVER be Failed by them — exactly the unreachability
+    //     ownerCount 99 produced, reached through the other operand of the same
+    //     subtraction. Cheapest rule in the file and it closes a whole direction of
+    //     the state machine.
+    //
+    //   approvalCount + rejectCount <= ownerCount     (+27 bytes)
+    //     One owner, one vote, so the two tallies together can never exceed the
+    //     owner count — approve and reject each demand a bit unset in BOTH bitmaps,
+    //     so at most ownerCount votes are ever recorded. This is the only upper
+    //     bound the execute path gets (its status-1 rule bounds approvalCount from
+    //     below), and it is what stops `approvalCount = 1000` being merely inert at
+    //     execute rather than rejected. Written as a sum, not as two comparisons:
+    //     stronger, and 6 bytes cheaper (a separate `approvalCount <= ownerCount`
+    //     plus `rejectCount <= ownerCount` measures +33).
+    //     It cannot strand an honest proposal: the honest maximum is exactly
+    //     ownerCount (every owner votes once), and the last vote is admitted from a
+    //     state whose sum is ownerCount - 1.
+    //
+    // WHAT IS DELIBERATELY NOT CHECKED, with the byte cost each would have carried.
+    // The bitmaps are NOT tied to the counts, and that is a considered decision
+    // rather than an omission:
+    //
+    //   approvalCount == popcount(approvalBitmap) (and the same for reject) — the
+    //     exact rule, five conditional adds per bitmap because Silverscript has no
+    //     shift and the state's byte[8] form has no popcount: +959 bytes measured
+    //     on this file (1720 -> 2679), a 56% growth of a script that every vote
+    //     reveals. The exact figure moves by a few dozen bytes with how the five
+    //     adds are written; nothing near enough to change the verdict. It is not
+    //     merely expensive, it
+    //     buys NOTHING, and that is why it is out rather than deferred: the only
+    //     party who can write an inconsistent count is the planter, and the planter
+    //     can equally write a CONSISTENT one. Count c with an empty bitmap and count
+    //     c with c bits set demand the same c-to-threshold remainder of real
+    //     signatures; the consistent form merely also burns c slots, which the
+    //     planter aims at owners he does not control anyway. Anything the inflated
+    //     form reaches, the consistent form reaches too — so the rule that rejects
+    //     the first while admitting the second changes no attacker's capability.
+    //     The bound above (counts <= ownerCount) is what actually caps the tallies,
+    //     and unlike popcount it is not something a consistent state can restore.
+    //
+    //   zero bitmap implies zero count — the cheap stand-in for popcount, +111
+    //     bytes. Rejected for the same reason and one more: it is the special case
+    //     of a rule that buys nothing, so it would buy nothing while LOOKING like
+    //     the counts were tied to the bitmaps. A guard that reads stronger than it
+    //     is costs more than its bytes.
+    //
+    //   no bit set at or beyond ownerCount — +320 bytes for the dead-mask if-chain.
+    //     Such a bit is inert: maskFor() only ever produces bits 0..4 and only for
+    //     `ownerIndex < ownerCount`, so a bit above the live slots can never be
+    //     tested by a vote, can never block a voter, and (popcount being out) enters
+    //     no arithmetic. It is junk in a field only off-chain readers display, and
+    //     they can mask it themselves for free.
+    //
+    //   (approvalBitmap & rejectBitmap) == 0 — +48 bytes. Honest states satisfy it
+    //     already (each vote demands its bit clear in both maps), so it only ever
+    //     rejects planted states — and a planted state with a bit in both maps is
+    //     STRICTLY LESS dangerous than the same state with the bit in one, because
+    //     either map alone already disqualifies that slot from voting. 48 bytes to
+    //     reject the tamer of two forgeries is a bad trade.
+    //
+    //   status is one of 0..3 — +0, because it is already exact: approve and reject
+    //     require status == 0 and execute requires status == 1 before either calls
+    //     this function, so a domain bound here would be pure redundancy. What is
+    //     NOT redundant is status/tally CONSISTENCY, and that is checked at the
+    //     entrypoints where the status is known — see requirePendingTally() and the
+    //     one-line status-1 rule in execute().
+    //
+    //   owner-slot distinctness — unchanged from before this rule set, and still
+    //     out: ~280 bytes (unused slots carry the same NUMS pad, so slots may only
+    //     be compared below ownerCount, which means one guarded block per slot), and
+    //     whoever can plant a snapshot with a repeated owner can equally plant one
+    //     naming a single key they hold. It is enforced KoRoot-side over the sets
+    //     KoRoot mints and installs.
+    // ===========================================================================
+    function requireSaneSnapshot() {
+        require(ownerCount >= 1);
+        require(ownerCount <= 5);
+        require(snapThreshold >= 1);
+        require(snapThreshold <= ownerCount);
+        require(approvalCount >= 0);
+        require(rejectCount >= 0);
+        require(approvalCount + rejectCount <= ownerCount);
+    }
+
+    // The status-0 half of the tally invariant, for the two entrypoints that have
+    // already required status == 0. Pending is not a free label: a state carrying
+    // enough approvals to be Approved, or enough rejections to be Failed, is one
+    // this contract would itself have relabelled, so presenting it as Pending is a
+    // claim about a history that never happened. Both rules are inductive — approve
+    // takes the first branch precisely when newCount < snapThreshold, reject takes
+    // it precisely when (ownerCount - newRejectCount) >= snapThreshold — so an
+    // honest proposal satisfies them at every step from KoRoot's mint onward and
+    // nothing here can strand one.
+    //
+    // Division of labour with requireSaneSnapshot, since it is easy to over-credit
+    // this pair: the ABSURD seed (approvalCount 1000) dies at the sum rule above,
+    // because 1000 exceeds any owner count. What dies HERE is the plausible seed —
+    // a 3-of-5 planted with approvalCount exactly 3, inside every count bound, whose
+    // very next approval would write status 1 while the proposal still displayed
+    // itself as Pending — and its mirror, a proposal displaying rejectCount 3 out of
+    // 5 against a threshold of 3 while still accepting approvals. Both are labels
+    // contradicting their own tallies, which is what makes `status` a derived fact
+    // that KoVault and KoRoot can read at face value instead of a byte the minter
+    // chose.
+    //
+    // What it does NOT buy, so nobody re-derives it later: a seed BELOW the threshold
+    // (approvalCount 2 on a 3-of-5) is still accepted, and still means one signature
+    // finishes the proposal. That is not a gap these rules could close — it is an
+    // honest state, reachable by two real approvals, and a planter who wants it can
+    // set two real bits. Forging votes is the planter's, always; forging arithmetic
+    // is not. +30 bytes across both call sites (identical inlined either way;
+    // measured as a shared function and as two copies).
+    function requirePendingTally() {
+        require(approvalCount < snapThreshold);
+        require((ownerCount - rejectCount) >= snapThreshold);
+    }
+
+    // Phase 3 — record one on-chain approval.
+    entrypoint function approve(int ownerIndex, sig ownerSig) {
+        require(status == 0);                          // must be Pending
+        // Lineage + output pinning (see the note on execute): this proposal must be
+        // a real covenant UTXO, and its continuation must be the ONLY output that
+        // carries the id — otherwise a spend could mint extra id-bearing outputs.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(OpCovOutputCount(cid) == 1);
+        require(OpCovOutputIdx(cid, 0) == 0);
+        requireSaneSnapshot();                         // snapshot must be well-formed
+        requirePendingTally();                         // ...and Pending must be earned
+        require(ownerIndex >= 0);
+        require(ownerIndex < ownerCount);
+
+        byte[8] mask = maskFor(ownerIndex);
+        require((approvalBitmap & mask) == 0x0000000000000000); // no duplicate approval
+        require((rejectBitmap & mask) == 0x0000000000000000);   // can't approve after rejecting
+        require(checkSig(ownerSig, ownerAt(ownerIndex)));
+
+        byte[8] newBitmap = approvalBitmap | mask;
+        int newCount = approvalCount + 1;
+        int newStatus = 0;
+        if (newCount >= snapThreshold) {
+            newStatus = 1;                             // Approved
+        }
+
+        // Continuation: same proposal, updated approval fields; owner snapshot preserved.
+        validateOutputState(0, {
+            proposalId: proposalId,
+            operation: operation,
+            recipientSpkHash: recipientSpkHash,
+            amount: amount,
+            maxFee: maxFee,
+            expiresAt: expiresAt,
+            executionDelay: executionDelay,
+            approvalBitmap: newBitmap,
+            approvalCount: newCount,
+            status: newStatus,
+            snapThreshold: snapThreshold,
+            ownerCount: ownerCount,
+            owner0: owner0,
+            owner1: owner1,
+            owner2: owner2,
+            owner3: owner3,
+            owner4: owner4,
+            rejectBitmap: rejectBitmap,
+            rejectCount: rejectCount,
+            vaultSpkHash: vaultSpkHash
+        });
+
+        // Cap value leakage to the declared fee.
+        //
+        // Written against THIS input's value, unlike the input-SET sums KoVault
+        // and KoRoot make — deliberately, and this is the one place in the three
+        // contracts where the two differ, so here is why. A per-input floor is
+        // unsound exactly when several UTXOs of the same address can be spent in
+        // one transaction while a single continuation satisfies every copy of the
+        // script; that is the vault's normal case (all vault UTXOs share one
+        // address) and the root's reachable one. A proposal is different: the
+        // continuation above pins all 19 state fields to THIS input's own state,
+        // so a second proposal input can only co-validate if its state is
+        // identical — and state lives inside the redeem script, so identical state
+        // means the identical P2SH address, i.e. a byte-for-byte duplicate UTXO.
+        // KoRoot mints one proposal per spend at a nonce it has just bumped, so
+        // two of those cannot exist under an honest lineage; and a plain payment
+        // to a proposal address is unbound, so its own copy of this script stops
+        // at the non-zero-id require above and it cannot ride along. What remains
+        // is a genesis planter binding two identical proposal outputs and later
+        // spending both — leaking the smaller of the two, which is his own money,
+        // through a proposal only he can vote on. The sum walk that would close
+        // that measures +966 bytes (1720 -> 2686, silc, both entrypoints), a 56%
+        // growth of a script REVEALED IN THE SIGNATURE SCRIPT of every approve,
+        // reject and execute — paid by every owner of every treasury on every
+        // vote, to protect a planter from himself. If a proposal address ever
+        // becomes something users are told to pay into, this decision changes.
+        int inVal = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inVal - maxFee);
+    }
+
+    // Phase 4 (proposal side) — proposal is consumed together with its paired
+    // covenant input: the KoVault for a TRANSFER (operation 1), or the KoRoot
+    // for a CONFIG change (operation 2). Mutual validation: the paired contract
+    // enforces the actual effect (money movement / owner rotation); here we require
+    // Approved + timelock + same-covenant pairing, AND that an owner authorizes the
+    // execution (the snapshot owner set decides). No proposal continuation.
+    // `pairedInputIndex` is the vault input (transfer) or the root input (config).
+    entrypoint function execute(int pairedInputIndex, int ownerIndex, sig ownerSig) {
+        require(status == 1);                          // Approved
+        require(this.age >= executionDelay);           // execution delay (timelock)
+        // LINEAGE. OpInputCovenantId yields ZERO_HASH (not an error) for an unbound
+        // input, so a bare `a == b` passes whenever BOTH sides are unbound — which
+        // would let a self-minted proposal-shaped UTXO pair with a plain payment sent
+        // to a vault/root address. Demand a real covenant id on this input.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        // MUTUAL VALIDATION means a SECOND script runs and enforces the effect. Say
+        // so: `pairedInputIndex` naming this very input satisfies the id equality
+        // above trivially, and then no other contract is present at all.
+        require(pairedInputIndex != this.activeInputIndex);
+        require(OpInputCovenantId(pairedInputIndex) == cid);
+        // Exactly one output continues the lineage: the paired contract's own
+        // continuation (vault change for a TRANSFER, root state for a CONFIG). This
+        // proposal is consumed, and nothing else may inherit the id.
+        require(OpCovOutputCount(cid) == 1);
+        // MINTING. The rule above counts the continuations but never says WHO may
+        // parent one, and consensus is happy for this input to be that parent. So
+        // without the rule below, one owner spends an Approved proposal and has it
+        // parent the single permitted output — an output of ANY shape, carrying the
+        // treasury's own lineage. He makes it a forged proposal naming himself for
+        // the whole balance: same id, same template, status Approved. The vault
+        // cannot tell it apart, because on-chain it IS the treasury's lineage.
+        // This proposal is CONSUMED here and parents nothing; only the paired
+        // contract may carry the lineage forward, under rules of its own.
+        require(OpAuthOutputCount(this.activeInputIndex) == 0);
+        requireSaneSnapshot();                         // snapshot must be well-formed
+        // The status-1 half of the tally invariant (status == 1 is required above).
+        // Approved is the label the vault and the root both act on — KoVault releases
+        // treasury and KoRoot installs an owner set on `p.status == 1` and re-derive
+        // nothing — so it must mean what it says here or it means nothing anywhere.
+        // With the bounds above this reads snapThreshold <= approvalCount <= ownerCount:
+        // at least a threshold's worth of the named owners, and never more of them
+        // than exist. +6 bytes, the cheapest rule in the contract.
+        require(approvalCount >= snapThreshold);
+        require(ownerIndex >= 0);
+        require(ownerIndex < ownerCount);
+        require(checkSig(ownerSig, ownerAt(ownerIndex))); // an owner must trigger
+    }
+
+    // Anyone can retire an expired, non-executed proposal (frees the UTXO).
+    // tx.time is a LOWER bound, so this ">=" check is the only sound use of
+    // expiry on-chain (see docs/RISKS.md).
+    //
+    // The BOND GOES HOME, not to the closer. This path used to pay whoever ran
+    // it, which made every proposal nearing a real expiry a public bounty: a
+    // stranger sniping the close profits from destroying an Approved transfer,
+    // racing the owners' own execute with the treasury's payout as the stake
+    // (RISKS #17). Now output 0 must pay the full bond to the treasury's own
+    // vault address — committed in state as vaultSpkHash by KoRoot at mint, so
+    // neither the proposer nor the closer chooses it — where it lands as an
+    // unbound stray the next sweep folds in. Closing stays permissionless but
+    // pays nothing: the closer funds the network fee from their own inputs
+    // (change at index 1+ is theirs), so griefing costs money and yields none,
+    // and the owners are the natural closers.
+    entrypoint function closeExpired() {
+        require(status != 3);
+        require(tx.time >= expiresAt);
+        // This path is PERMISSIONLESS, so without a pin it is a covenant-minting
+        // oracle: anyone could spend a genuinely bound, expired proposal and continue
+        // its id onto an attacker-chosen script, then pair that with the vault. The
+        // proposal is retired here — nothing may inherit the lineage.
+        require(OpCovOutputCount(OpInputCovenantId(this.activeInputIndex)) == 0);
+        // The bond returns to the vault's P2SH, at full value over the input SET —
+        // the same walk KoRoot/KoVault make, for the same reason: every co-spent
+        // copy of this script is satisfied by the same output 0, so a per-input
+        // floor would let all but one bond walk out to the closer. The output is
+        // necessarily UNBOUND (the ==0 pin above), i.e. a stray deposit.
+        byte[] vaultSpk = new ScriptPubKeyP2SH(vaultSpkHash);
+        require(tx.outputs[0].scriptPubKey == vaultSpk);
+        byte[] propSpk = tx.inputs[this.activeInputIndex].scriptPubKey;
+        int bondIn = 0;
+        for (i, 0, tx.inputs.length, maxTxInputs) {
+            if (tx.inputs[i].scriptPubKey == propSpk) {
+                bondIn = bondIn + tx.inputs[i].value;
+            }
+        }
+        require(tx.outputs[0].value >= bondIn);
+        // No requireSaneSnapshot() here, on purpose: this path reads neither
+        // snapThreshold nor ownerCount, takes no owner index and checks no signature
+        // — it retires the UTXO and lets nothing inherit the lineage, so a malformed
+        // snapshot cannot influence its outcome. Demanding a well-formed snapshot
+        // would only strand a malformed proposal's value, since retiring one is the
+        // single thing that remains possible once the voting paths reject it.
+    }
+
+    // Phase 3b — record one on-chain rejection (mirrors approve). When rejections
+    // make approval impossible (ownerCount - rejectCount < snapThreshold), the
+    // proposal Fails (status 2) and can no longer be approved or executed. Placed
+    // last so approve=0/execute=1/closeExpired=2 selectors stay put; reject=3.
+    entrypoint function reject(int ownerIndex, sig ownerSig) {
+        require(status == 0);                          // must be Pending
+        // Same lineage + output pinning as approve.
+        byte[32] cid = OpInputCovenantId(this.activeInputIndex);
+        require(cid != 0x0000000000000000000000000000000000000000000000000000000000000000);
+        require(OpCovOutputCount(cid) == 1);
+        require(OpCovOutputIdx(cid, 0) == 0);
+        requireSaneSnapshot();                         // snapshot must be well-formed
+        requirePendingTally();                         // ...and Pending must be earned
+        require(ownerIndex >= 0);
+        require(ownerIndex < ownerCount);
+
+        byte[8] mask = maskFor(ownerIndex);
+        require((rejectBitmap & mask) == 0x0000000000000000);   // no duplicate rejection
+        require((approvalBitmap & mask) == 0x0000000000000000); // can't reject after approving
+        require(checkSig(ownerSig, ownerAt(ownerIndex)));
+
+        byte[8] newRejectBitmap = rejectBitmap | mask;
+        int newRejectCount = rejectCount + 1;
+        int newStatus = 0;
+        if ((ownerCount - newRejectCount) < snapThreshold) {
+            newStatus = 2;                             // Cancelled / Failed
+        }
+
+        // Continuation: same proposal, updated rejection fields; owner snapshot preserved.
+        validateOutputState(0, {
+            proposalId: proposalId,
+            operation: operation,
+            recipientSpkHash: recipientSpkHash,
+            amount: amount,
+            maxFee: maxFee,
+            expiresAt: expiresAt,
+            executionDelay: executionDelay,
+            approvalBitmap: approvalBitmap,
+            approvalCount: approvalCount,
+            status: newStatus,
+            snapThreshold: snapThreshold,
+            ownerCount: ownerCount,
+            owner0: owner0,
+            owner1: owner1,
+            owner2: owner2,
+            owner3: owner3,
+            owner4: owner4,
+            rejectBitmap: newRejectBitmap,
+            rejectCount: newRejectCount,
+            vaultSpkHash: vaultSpkHash
+        });
+
+        // Cap value leakage to the declared fee (per-input, for the reason set out
+        // at the same line in approve).
+        int inVal = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inVal - maxFee);
+    }
+}

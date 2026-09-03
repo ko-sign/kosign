@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# cloned, locally-built Silverscript compiler (rebuild via scripts/build-compiler.sh)
+.tooling/
+
+# compiled contract artifacts are reproducible from contracts/ — keep them out of git
+# (comment this out if you want to vendor a pinned set)
+artifacts/*.json
+
+# secrets — RPC api keys, mnemonics. NEVER commit.
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+
+# rust build artifacts (tools/kaspa-probe)
+target/
+
+# local dev secrets (testnet keys) — NEVER commit
+.secrets/
+
+# stats indexer registry (runtime state)
+indexer/data/
+
+# staging area produced by scripts/make-opensource.sh
+opensource/
